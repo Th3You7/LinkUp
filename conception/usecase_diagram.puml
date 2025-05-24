@@ -1,0 +1,155 @@
+@startuml LinkUp_usecase_diagram
+left to right direction
+
+actor :User: as A1
+actor :RegistredUser: as A2
+actor :UnregistredUser: as A3
+
+rectangle LinkUpApp {
+    usecase (Register) as U1
+    usecase (Login) as U2
+
+    usecase (Send Invitation) as U3
+    usecase (Accept Invitation) as U4
+    usecase (Decline Invitation) as U50
+    usecase (Cancel Invitation) as U5
+
+    usecase (Create Post) as U6
+    usecase (Read Post) as U7
+    usecase (Read All Posts) as U8
+    usecase (Update Post) as U9
+    usecase (Delete Post) as U10
+
+    usecase (Create Comment) as U11
+    usecase (Read Comment) as U12
+    usecase (Read All Comments) as U13
+    usecase (Update Comment) as U14
+    usecase (Delete Comment) as U15
+
+    usecase (Create Post's Reaction) as U16
+    usecase (Read Post's Reaction) as U17
+    usecase (Read All Post's Reactions) as U18
+    usecase (Update Reaction) as U19
+    usecase (Delete Post's Reaction) as U20
+
+    usecase (Create Comment's Reply) as U21
+    usecase (Read Comment's Reply) as U22
+    usecase (Read All comment's  Replies) as U23
+    usecase (Update Comment's Reply) as U24
+    usecase (Delete Comment's Reply) as U25
+
+    usecase (Send Message) as U26
+    usecase (Read Message) as U27
+    usecase (Read All Messages) as U28
+    usecase (Update Message) as U29
+    usecase (Delete Message) as U30
+
+    usecase (Visit User Profile) as U31
+    usecase (Update Profile) as U32
+    usecase (Delete Account) as U33
+
+    usecase (Read Notifications) as U34
+    usecase (Delete Chat Session) as U35
+    usecase (Block User) as U36
+    usecase (Authentication) as U37
+    
+}
+
+A1 -- A2
+A1 -- A3
+
+
+A3 -- U31
+A3 -- U1
+A3 -- U7
+
+A2 -- U1
+A2 -- U2
+
+A2 -- U3
+A2 -- U4
+A2 -- U5
+A2 -- U50
+
+A2 -- U6 
+A2 -- U7
+A2 -- U8
+A2 -- U9
+A2 -- U10
+
+A2 -- U11
+A2 -- U12
+A2 -- U13
+A2 -- U14
+A2 -- U15
+
+A2 -- U16
+A2 -- U17
+A2 -- U18
+A2 -- U19
+A2 -- U20
+
+A2 -- U21
+A2 -- U22
+A2 -- U23
+A2 -- U24
+A2 -- U25
+
+A2 -- U26
+A2 -- U27
+A2 -- U28
+A2 -- U29
+A2 -- U30
+
+A2 -- U31
+A2 -- U32
+A2 -- U33
+
+A2 -- U34
+A2 -- U35
+A2 -- U36
+
+U3 --> U37
+U4 --> U37
+U5 --> U37
+U50 --> U37
+
+U6 --> U37 
+U8 --> U37
+U9 --> U37
+U10 --> U37
+
+U11 --> U37
+U12 --> U37
+U13 --> U37
+U14 --> U37
+U15 --> U37
+
+U16 --> U37
+U17 --> U37
+U18 --> U37
+U19 --> U37
+U20 --> U37
+
+U21 --> U37
+U22 --> U37
+U23 --> U37
+U24 --> U37
+U25 --> U37
+
+U26 --> U37
+U27 --> U37
+U28 --> U37
+U29 --> U37
+U30 --> U37
+
+
+U32 --> U37
+U33 --> U37
+
+U34 --> U37
+U35 --> U37
+U36 --> U37
+
+
+@enduml
