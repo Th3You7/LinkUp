@@ -1,0 +1,75 @@
+@startuml Linkup_diagramm_class
+class User {
+    -id: UUID
+    -firstName: String
+    -lastName: String
+    -email: String
+    -password: String
+}
+
+class Friendship {
+    -id: UUID
+    -status: String
+}
+
+class Post {
+    -id: UUID
+    -content: String
+    -imgUrl: String
+}
+
+class Comment {
+    -id: UUID
+    -content: String
+    -createdAt: DateTime
+    -updatedAt: DateTime
+}
+
+class Like {
+    -id: UUID
+    -createdAt: DateTime
+}
+
+class Reply {
+    -id: UUID
+    -createAt: DateTime
+    -updatedAt: DateTime
+}
+
+class ChatSession {
+    -id: UUID
+    -lastMessage: Message
+}
+
+class Message {
+    -id: UUID
+    -contentType: String
+    -mediaUrl: String
+    -content: String
+}
+
+class Invitation {
+    -status: InvitationStatus
+}
+
+enum InvitationStatus {
+    ACCEPTED,
+    PENDING,
+    REJECTED,
+    CANCELED
+}
+
+
+User "1" -- "0..*" Post : "manage"
+User "1" -- "0..*" Like : "manage"
+User "1" -- "0..* " Comment : "manage"
+User "1" -- "0..*" Reply : "manage"
+User "2" -- "0..*" ChatSession : "manage"
+User "2" -- "0..*" Invitation : "manage"
+User "2" -- "0..*" Friendship : "manage" 
+ChatSession "1" *-- "1..* " Message : "has"
+Post "1" *-- "0..*" Like : "has"
+Post "1" *-- "0..*" Comment : "has"
+
+
+@enduml
