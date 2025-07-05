@@ -1,0 +1,51 @@
+package app.com.server.repos;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import app.com.server.model.Post;
+import app.com.server.model.User;
+
+@Repository
+public interface PostRepository extends JpaRepository<Post, String> {
+    
+    // Find all posts by a specific user
+    List<Post> findByUserOrderByCreatedAtDesc(User user);
+    
+    // Find all posts by user ID
+    List<Post> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    
+    // Find posts by user with pagination
+    Page<Post> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
+    
+    // Find posts by user ID with pagination
+    Page<Post> findByUserIdOrderByCreatedAtDesc(UUID userId, Pageable pageable);
+    
+    // Find all posts ordered by creation date (for feed)
+    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    
+    // Find posts containing specific content
+    @Query("SELECT p FROM Post p WHERE LOWER(p.content) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    Page<Post> findByContentOrTitleContainingIgnoreCase(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    // Find posts by multiple users (for friends' posts)
+    @Query("SELECT p FROM Post p WHERE p.user.id IN :userIds ORDER BY p.createdAt DESC")
+    Page<Post> findByUserIdInOrderByCreatedAtDesc(@Param("userIds") List<UUID> userIds, Pageable pageable);
+    
+    // Find posts created between two dates
+    List<Post> findByCreatedAtBetweenOrderByCreatedAtDesc(LocalDateTime startDate, LocalDateTime endDate);
+    
+    // Count posts by user
+    long countByUser(User user);
+    
+    // Count posts by user ID
+    long countByUserId(UUID userId);
+} 

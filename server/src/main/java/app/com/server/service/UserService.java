@@ -1,0 +1,172 @@
+package app.com.server.service;
+
+import app.com.server.dto.CreateUserDto;
+import app.com.server.dto.UserDto;
+import app.com.server.model.User;
+import app.com.server.repos.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+public class UserService {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PostService postService;
+    
+    // Create a new user
+    public UserDto createUser(CreateUserDto createUserDto) {
+        // Validate input
+        if (createUserDto.getEmail() == null || createUserDto.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (createUserDto.getPassword() == null || createUserDto.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password is required");
+        }
+        if (createUserDto.getUsername() == null || createUserDto.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        
+        // Check if email already exists
+        if (userRepository.existsByEmail(createUserDto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+        
+        // Check if username already exists
+        if (userRepository.existsByUsername(createUserDto.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        
+        // Create new user
+        User user = new User();
+        user.setFirstName(createUserDto.getFirstName());
+        user.setLastName(createUserDto.getLastName());
+        user.setUsername(createUserDto.getUsername());
+        user.setEmail(createUserDto.getEmail());
+        user.setPassword(createUserDto.getPassword()); // In a real app, this should be hashed
+        
+        User savedUser = userRepository.save(user);
+        return convertToDto(savedUser);
+    }
+    
+    // Get user by ID
+    public UserDto getUserById(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return convertToDto(user.get());
+        }
+        throw new IllegalArgumentException("User not found with id: " + id);
+    }
+    
+    // Get user by email
+    public UserDto getUserByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            return convertToDto(user.get());
+        }
+        throw new IllegalArgumentException("User not found with email: " + email);
+    }
+    
+    // Get user by username
+    public UserDto getUserByUsername(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
+            return convertToDto(user.get());
+        }
+        throw new IllegalArgumentException("User not found with username: " + username);
+    }
+    
+    // Get all users
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    
+    // Search users by name
+    public List<UserDto> searchUsersByName(String searchTerm) {
+        return userRepository.findByFirstNameOrLastNameContainingIgnoreCase(searchTerm).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    
+    // Search users by username
+    public List<UserDto> searchUsersByUsername(String searchTerm) {
+        return userRepository.findByUsernameContainingIgnoreCase(searchTerm).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    
+    // Update user
+    public UserDto updateUser(UUID id, CreateUserDto updateUserDto) {
+        Optional<User> existingUser = userRepository.findById(id);
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            
+            // Update fields if provided
+            if (updateUserDto.getFirstName() != null) {
+                user.setFirstName(updateUserDto.getFirstName());
+            }
+            if (updateUserDto.getLastName() != null) {
+                user.setLastName(updateUserDto.getLastName());
+            }
+            if (updateUserDto.getUsername() != null && !updateUserDto.getUsername().equals(user.getUsername())) {
+                if (userRepository.existsByUsername(updateUserDto.getUsername())) {
+                    throw new IllegalArgumentException("Username already exists");
+                }
+                user.setUsername(updateUserDto.getUsername());
+            }
+            if (updateUserDto.getEmail() != null && !updateUserDto.getEmail().equals(user.getEmail())) {
+                if (userRepository.existsByEmail(updateUserDto.getEmail())) {
+                    throw new IllegalArgumentException("Email already exists");
+                }
+                user.setEmail(updateUserDto.getEmail());
+            }
+            if (updateUserDto.getPassword() != null) {
+                user.setPassword(updateUserDto.getPassword()); // In a real app, this should be hashed
+            }
+            
+            User savedUser = userRepository.save(user);
+            return convertToDto(savedUser);
+        }
+        throw new IllegalArgumentException("User not found with id: " + id);
+    }
+    
+    // Delete user
+    public void deleteUser(UUID id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("User not found with id: " + id);
+        }
+    }
+    
+    // Authenticate user
+    public UserDto authenticateUser(String email, String password) {
+        Optional<User> user = userRepository.findByEmailAndPassword(email, password);
+        if (user.isPresent()) {
+            return convertToDto(user.get());
+        }
+        throw new IllegalArgumentException("Invalid email or password");
+    }
+    
+    // Convert User entity to UserDto
+    private UserDto convertToDto(User user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setPostCount(user.getPosts().size());
+        dto.setCommentCount(user.getComments().size());
+        return dto;
+    }
+} 

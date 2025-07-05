@@ -1,0 +1,39 @@
+package app.com.server.repos;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import app.com.server.model.User;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
+    
+    // Find user by email
+    Optional<User> findByEmail(String email);
+    
+    // Find user by username
+    Optional<User> findByUsername(String username);
+    
+    // Check if email exists
+    boolean existsByEmail(String email);
+    
+    // Check if username exists
+    boolean existsByUsername(String username);
+    
+    // Find users by first name or last name containing the search term
+    @Query("SELECT u FROM User u WHERE LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<User> findByFirstNameOrLastNameContainingIgnoreCase(@Param("searchTerm") String searchTerm);
+    
+    // Find users by username containing the search term
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<User> findByUsernameContainingIgnoreCase(@Param("searchTerm") String searchTerm);
+    
+    // Find user by email and password (for authentication)
+    Optional<User> findByEmailAndPassword(String email, String password);
+} 

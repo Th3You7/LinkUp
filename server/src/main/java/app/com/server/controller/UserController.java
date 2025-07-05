@@ -1,0 +1,141 @@
+package app.com.server.controller;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import app.com.server.dto.CreateUserDto;
+import app.com.server.dto.UserDto;
+import app.com.server.service.UserService;
+
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
+public class UserController {
+    
+    @Autowired
+    private UserService userService;
+    
+    // ==================== CREATE ====================
+    
+    // Create a new user
+    @PostMapping
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
+        try {
+            UserDto createdUser = userService.createUser(createUserDto);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    // ==================== READ ====================
+    
+    // Get all users
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+    
+    // Get user by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
+        try {
+            UserDto user = userService.getUserById(id);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    // Get user by email
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+        try {
+            UserDto user = userService.getUserByEmail(email);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    // Get user by username
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        try {
+            UserDto user = userService.getUserByUsername(username);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    // ==================== SEARCH ====================
+    
+    // Search users by name
+    @GetMapping("/search/name")
+    public ResponseEntity<List<UserDto>> searchUsersByName(@RequestParam String searchTerm) {
+        List<UserDto> users = userService.searchUsersByName(searchTerm);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+    
+    // Search users by username
+    @GetMapping("/search/username")
+    public ResponseEntity<List<UserDto>> searchUsersByUsername(@RequestParam String searchTerm) {
+        List<UserDto> users = userService.searchUsersByUsername(searchTerm);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+    
+    // ==================== UPDATE ====================
+    
+    // Update user
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable UUID id, @RequestBody CreateUserDto updateUserDto) {
+        try {
+            UserDto updatedUser = userService.updateUser(id, updateUserDto);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    // ==================== DELETE ====================
+    
+    // Delete user
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        try {
+            userService.deleteUser(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    // ==================== AUTHENTICATION ====================
+    
+    // Authenticate user
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@RequestParam String email, @RequestParam String password) {
+        try {
+            UserDto user = userService.authenticateUser(email, password);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+} 
