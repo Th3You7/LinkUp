@@ -187,6 +187,306 @@ GET /api/posts/date-range?startDate=2024-01-01T00:00:00&endDate=2024-12-31T23:59
 GET /api/posts/user/{userId}/count
 ```
 
+### Comment Management
+
+#### Create Comment
+
+```
+POST /api/comments
+Content-Type: application/json
+
+{
+  "content": "Great post!",
+  "userId": "user-uuid-here",
+  "postId": "post-id-here"
+}
+```
+
+#### Get Comment by ID
+
+```
+GET /api/comments/{id}
+```
+
+#### Get Comments by Post ID
+
+```
+GET /api/comments/post/{postId}
+```
+
+#### Get Comments by Post ID (with pagination)
+
+```
+GET /api/comments/post/{postId}/page?page=0&size=10
+```
+
+#### Get Comments by User ID
+
+```
+GET /api/comments/user/{userId}
+```
+
+#### Get Comments by User ID (with pagination)
+
+```
+GET /api/comments/user/{userId}/page?page=0&size=10
+```
+
+#### Search Comments
+
+```
+GET /api/comments/search?searchTerm=great&page=0&size=10
+```
+
+#### Update Comment
+
+```
+PUT /api/comments/{id}
+Content-Type: application/json
+
+{
+  "content": "Updated comment content",
+  "userId": "user-uuid-here",
+  "postId": "post-id-here"
+}
+```
+
+#### Delete Comment
+
+```
+DELETE /api/comments/{id}
+```
+
+#### Delete Comments by User ID
+
+```
+DELETE /api/comments/user/{userId}
+```
+
+#### Delete Comments by Post ID
+
+```
+DELETE /api/comments/post/{postId}
+```
+
+#### Get Comment Count by Post
+
+```
+GET /api/comments/post/{postId}/count
+```
+
+#### Get Comment Count by User
+
+```
+GET /api/comments/user/{userId}/count
+```
+
+### Reply Management
+
+#### Create Reply
+
+```
+POST /api/replies
+Content-Type: application/json
+
+{
+  "content": "I agree with you!",
+  "userId": "user-uuid-here",
+  "commentId": "comment-id-here"
+}
+```
+
+#### Get Reply by ID
+
+```
+GET /api/replies/{id}
+```
+
+#### Get Replies by Comment ID
+
+```
+GET /api/replies/comment/{commentId}
+```
+
+#### Get Replies by Comment ID (with pagination)
+
+```
+GET /api/replies/comment/{commentId}/page?page=0&size=10
+```
+
+#### Get Replies by User ID
+
+```
+GET /api/replies/user/{userId}
+```
+
+#### Get Replies by User ID (with pagination)
+
+```
+GET /api/replies/user/{userId}/page?page=0&size=10
+```
+
+#### Search Replies
+
+```
+GET /api/replies/search?searchTerm=agree&page=0&size=10
+```
+
+#### Update Reply
+
+```
+PUT /api/replies/{id}
+Content-Type: application/json
+
+{
+  "content": "Updated reply content",
+  "userId": "user-uuid-here",
+  "commentId": "comment-id-here"
+}
+```
+
+#### Delete Reply
+
+```
+DELETE /api/replies/{id}
+```
+
+#### Delete Replies by User ID
+
+```
+DELETE /api/replies/user/{userId}
+```
+
+#### Delete Replies by Comment ID
+
+```
+DELETE /api/replies/comment/{commentId}
+```
+
+#### Get Reply Count by Comment
+
+```
+GET /api/replies/comment/{commentId}/count
+```
+
+#### Get Reply Count by User
+
+```
+GET /api/replies/user/{userId}/count
+```
+
+### Reaction Management
+
+#### Create Reaction
+
+```
+POST /api/reactions
+Content-Type: application/json
+
+{
+  "name": "like",
+  "userId": "user-uuid-here",
+  "postId": "post-id-here"
+}
+```
+
+#### Get Reaction by ID
+
+```
+GET /api/reactions/{id}
+```
+
+#### Get Reactions by Post ID
+
+```
+GET /api/reactions/post/{postId}
+```
+
+#### Get Reactions by User ID
+
+```
+GET /api/reactions/user/{userId}
+```
+
+#### Get Reactions by Post ID and Name
+
+```
+GET /api/reactions/post/{postId}/name/{name}
+```
+
+#### Get Reactions by Name
+
+```
+GET /api/reactions/name/{name}
+```
+
+#### Get User's Reaction to Post
+
+```
+GET /api/reactions/post/{postId}/user/{userId}
+```
+
+#### Check if User Reacted to Post
+
+```
+GET /api/reactions/post/{postId}/user/{userId}/exists
+```
+
+#### Update Reaction
+
+```
+PUT /api/reactions/{id}
+Content-Type: application/json
+
+{
+  "name": "love",
+  "userId": "user-uuid-here",
+  "postId": "post-id-here"
+}
+```
+
+#### Delete Reaction
+
+```
+DELETE /api/reactions/{id}
+```
+
+#### Delete Reaction by Post and User
+
+```
+DELETE /api/reactions/post/{postId}/user/{userId}
+```
+
+#### Delete Reactions by User ID
+
+```
+DELETE /api/reactions/user/{userId}
+```
+
+#### Delete Reactions by Post ID
+
+```
+DELETE /api/reactions/post/{postId}
+```
+
+#### Get Reaction Count by Post
+
+```
+GET /api/reactions/post/{postId}/count
+```
+
+#### Get Reaction Count by User
+
+```
+GET /api/reactions/user/{userId}/count
+```
+
+#### Get Reaction Count by Post and Name
+
+```
+GET /api/reactions/post/{postId}/name/{name}/count
+```
+
 ## Database Schema
 
 ### User Entity
