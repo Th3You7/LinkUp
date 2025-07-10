@@ -1,16 +1,18 @@
 package app.com.server.service;
 
-import app.com.server.dto.CreateUserDto;
-import app.com.server.dto.UserDto;
-import app.com.server.model.User;
-import app.com.server.repos.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import app.com.server.dto.CreateUserDto;
+import app.com.server.dto.UserDto;
+import app.com.server.mapper.UserMapper;
+import app.com.server.model.User;
+import app.com.server.repos.UserRepository;
 
 @Service
 public class UserService {
@@ -20,6 +22,9 @@ public class UserService {
     
     @Autowired
     private PostService postService;
+    
+    @Autowired
+    private UserMapper userMapper;
     
     // Create a new user
     public UserDto createUser(CreateUserDto createUserDto) {
@@ -44,23 +49,19 @@ public class UserService {
             throw new IllegalArgumentException("Username already exists");
         }
         
-        // Create new user
-        User user = new User();
-        user.setFirstName(createUserDto.getFirstName());
-        user.setLastName(createUserDto.getLastName());
-        user.setUsername(createUserDto.getUsername());
-        user.setEmail(createUserDto.getEmail());
+        // Create new user using mapper
+        User user = userMapper.toEntity(createUserDto);
         user.setPassword(createUserDto.getPassword()); // In a real app, this should be hashed
         
         User savedUser = userRepository.save(user);
-        return convertToDto(savedUser);
+        return userMapper.toDto(savedUser);
     }
     
     // Get user by ID
     public UserDto getUserById(UUID id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            return convertToDto(user.get());
+            return userMapper.toDto(user.get());
         }
         throw new IllegalArgumentException("User not found with id: " + id);
     }
@@ -69,7 +70,7 @@ public class UserService {
     public UserDto getUserByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
-            return convertToDto(user.get());
+            return userMapper.toDto(user.get());
         }
         throw new IllegalArgumentException("User not found with email: " + email);
     }
@@ -78,7 +79,7 @@ public class UserService {
     public UserDto getUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
-            return convertToDto(user.get());
+            return userMapper.toDto(user.get());
         }
         throw new IllegalArgumentException("User not found with username: " + username);
     }
@@ -86,21 +87,21 @@ public class UserService {
     // Get all users
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::convertToDto)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
     
     // Search users by name
     public List<UserDto> searchUsersByName(String searchTerm) {
         return userRepository.findByFirstNameOrLastNameContainingIgnoreCase(searchTerm).stream()
-                .map(this::convertToDto)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
     
     // Search users by username
     public List<UserDto> searchUsersByUsername(String searchTerm) {
         return userRepository.findByUsernameContainingIgnoreCase(searchTerm).stream()
-                .map(this::convertToDto)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -134,7 +135,7 @@ public class UserService {
             }
             
             User savedUser = userRepository.save(user);
-            return convertToDto(savedUser);
+            return userMapper.toDto(savedUser);
         }
         throw new IllegalArgumentException("User not found with id: " + id);
     }
@@ -152,21 +153,8 @@ public class UserService {
     public UserDto authenticateUser(String email, String password) {
         Optional<User> user = userRepository.findByEmailAndPassword(email, password);
         if (user.isPresent()) {
-            return convertToDto(user.get());
+            return userMapper.toDto(user.get());
         }
         throw new IllegalArgumentException("Invalid email or password");
-    }
-    
-    // Convert User entity to UserDto
-    private UserDto convertToDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setPostCount(user.getPosts().size());
-        dto.setCommentCount(user.getComments().size());
-        return dto;
     }
 } 

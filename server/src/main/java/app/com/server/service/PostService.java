@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import app.com.server.dto.CreatePostDto;
 import app.com.server.dto.PostDto;
+import app.com.server.mapper.PostMapper;
 import app.com.server.model.Post;
 import app.com.server.model.User;
 import app.com.server.repos.PostRepository;
@@ -27,6 +28,9 @@ public class PostService {
     
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PostMapper postMapper;
     
     // Create a new post
     public PostDto createPost(CreatePostDto createPostDto) {
@@ -44,24 +48,21 @@ public class PostService {
             throw new IllegalArgumentException("User not found with id: " + createPostDto.getUserId());
         }
         
-        // Create new post
-        Post post = new Post();
-        post.setTitle(createPostDto.getTitle());
-        post.setContent(createPostDto.getContent());
-        post.setImage(createPostDto.getImage());
+        // Create new post using mapper
+        Post post = postMapper.toEntity(createPostDto);
         post.setUser(user.get());
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
         
         Post savedPost = postRepository.save(post);
-        return convertToDto(savedPost);
+        return postMapper.toDto(savedPost);
     }
     
     // Get post by ID
     public PostDto getPostById(String id) {
         Optional<Post> post = postRepository.findById(id);
         if (post.isPresent()) {
-            return convertToDto(post.get());
+            return postMapper.toDto(post.get());
         }
         throw new IllegalArgumentException("Post not found with id: " + id);
     }
@@ -70,13 +71,13 @@ public class PostService {
     public Page<PostDto> getAllPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(this::convertToDto);
+                .map(postMapper::toDto);
     }
     
     // Get posts by user ID
     public List<PostDto> getPostsByUserId(UUID userId) {
         return postRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::convertToDto)
+                .map(postMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -84,21 +85,21 @@ public class PostService {
     public Page<PostDto> getPostsByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(this::convertToDto);
+                .map(postMapper::toDto);
     }
     
     // Search posts by content or title
     public Page<PostDto> searchPosts(String searchTerm, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findByContentOrTitleContainingIgnoreCase(searchTerm, pageable)
-                .map(this::convertToDto);
+                .map(postMapper::toDto);
     }
     
     // Get posts by multiple users (for friends' posts)
     public Page<PostDto> getPostsByUserIds(List<UUID> userIds, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findByUserIdInOrderByCreatedAtDesc(userIds, pageable)
-                .map(this::convertToDto);
+                .map(postMapper::toDto);
     }
     
     // Update post
@@ -121,7 +122,7 @@ public class PostService {
             post.setUpdatedAt(LocalDateTime.now());
             
             Post savedPost = postRepository.save(post);
-            return convertToDto(savedPost);
+            return postMapper.toDto(savedPost);
         }
         throw new IllegalArgumentException("Post not found with id: " + id);
     }
@@ -144,30 +145,12 @@ public class PostService {
     // Get posts created between two dates
     public List<PostDto> getPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return postRepository.findByCreatedAtBetweenOrderByCreatedAtDesc(startDate, endDate).stream()
-                .map(this::convertToDto)
+                .map(postMapper::toDto)
                 .collect(Collectors.toList());
     }
     
     // Get post count by user
     public long getPostCountByUserId(UUID userId) {
         return postRepository.countByUserId(userId);
-    }
-    
-    // Convert Post entity to PostDto
-    private PostDto convertToDto(Post post) {
-        PostDto dto = new PostDto();
-        dto.setId(post.getId());
-        dto.setTitle(post.getTitle());
-        dto.setContent(post.getContent());
-        dto.setImage(post.getImage());
-        dto.setCreatedAt(post.getCreatedAt());
-        dto.setUpdatedAt(post.getUpdatedAt());
-        dto.setUserId(post.getUser().getId());
-        dto.setUserFirstName(post.getUser().getFirstName());
-        dto.setUserLastName(post.getUser().getLastName());
-        dto.setUsername(post.getUser().getUsername());
-        dto.setCommentCount(post.getComments().size());
-        dto.setReactionCount(post.getReactions().size());
-        return dto;
     }
 } 

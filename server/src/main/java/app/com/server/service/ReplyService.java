@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import app.com.server.dto.CreateReplyDto;
 import app.com.server.dto.ReplyDto;
+import app.com.server.mapper.ReplyMapper;
 import app.com.server.model.Comment;
 import app.com.server.model.Reply;
 import app.com.server.model.User;
@@ -32,6 +33,9 @@ public class ReplyService {
     
     @Autowired
     private CommentRepository commentRepository;
+    
+    @Autowired
+    private ReplyMapper replyMapper;
     
     // Create a new reply
     public ReplyDto createReply(CreateReplyDto createReplyDto) {
@@ -58,23 +62,22 @@ public class ReplyService {
             throw new IllegalArgumentException("Comment not found with id: " + createReplyDto.getCommentId());
         }
         
-        // Create new reply
-        Reply reply = new Reply();
-        reply.setContent(createReplyDto.getContent());
+        // Create new reply using mapper
+        Reply reply = replyMapper.toEntity(createReplyDto);
         reply.setUser(user.get());
         reply.setComment(comment.get());
         reply.setCreatedAt(LocalDateTime.now());
         reply.setUpdatedAt(LocalDateTime.now());
         
         Reply savedReply = replyRepository.save(reply);
-        return convertToDto(savedReply);
+        return replyMapper.toDto(savedReply);
     }
     
     // Get reply by ID
     public ReplyDto getReplyById(String id) {
         Optional<Reply> reply = replyRepository.findById(id);
         if (reply.isPresent()) {
-            return convertToDto(reply.get());
+            return replyMapper.toDto(reply.get());
         }
         throw new IllegalArgumentException("Reply not found with id: " + id);
     }
@@ -82,7 +85,7 @@ public class ReplyService {
     // Get all replies by comment ID
     public List<ReplyDto> getRepliesByCommentId(String commentId) {
         return replyRepository.findByCommentIdOrderByCreatedAtDesc(commentId).stream()
-                .map(this::convertToDto)
+                .map(replyMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -90,13 +93,13 @@ public class ReplyService {
     public Page<ReplyDto> getRepliesByCommentId(String commentId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return replyRepository.findByCommentIdOrderByCreatedAtDesc(commentId, pageable)
-                .map(this::convertToDto);
+                .map(replyMapper::toDto);
     }
     
     // Get all replies by user ID
     public List<ReplyDto> getRepliesByUserId(UUID userId) {
         return replyRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::convertToDto)
+                .map(replyMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -104,14 +107,14 @@ public class ReplyService {
     public Page<ReplyDto> getRepliesByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return replyRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(this::convertToDto);
+                .map(replyMapper::toDto);
     }
     
     // Search replies by content
     public Page<ReplyDto> searchReplies(String searchTerm, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return replyRepository.findByContentContainingIgnoreCase(searchTerm, pageable)
-                .map(this::convertToDto);
+                .map(replyMapper::toDto);
     }
     
     // Update reply
@@ -128,7 +131,7 @@ public class ReplyService {
             reply.setUpdatedAt(LocalDateTime.now());
             
             Reply savedReply = replyRepository.save(reply);
-            return convertToDto(savedReply);
+            return replyMapper.toDto(savedReply);
         }
         throw new IllegalArgumentException("Reply not found with id: " + id);
     }
@@ -162,20 +165,5 @@ public class ReplyService {
     // Get reply count by user
     public long getReplyCountByUserId(UUID userId) {
         return replyRepository.countByUserId(userId);
-    }
-    
-    // Convert Reply entity to ReplyDto
-    private ReplyDto convertToDto(Reply reply) {
-        ReplyDto dto = new ReplyDto();
-        dto.setId(reply.getId());
-        dto.setContent(reply.getContent());
-        dto.setCreatedAt(reply.getCreatedAt());
-        dto.setUpdatedAt(reply.getUpdatedAt());
-        dto.setUserId(reply.getUser().getId());
-        dto.setUserFirstName(reply.getUser().getFirstName());
-        dto.setUserLastName(reply.getUser().getLastName());
-        dto.setUsername(reply.getUser().getUsername());
-        dto.setCommentId(reply.getComment().getId());
-        return dto;
     }
 } 
