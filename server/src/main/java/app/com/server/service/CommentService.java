@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import app.com.server.dto.CommentDto;
 import app.com.server.dto.CreateCommentDto;
+import app.com.server.mapper.CommentMapper;
 import app.com.server.model.Comment;
 import app.com.server.model.Post;
 import app.com.server.model.User;
@@ -32,6 +33,9 @@ public class CommentService {
     
     @Autowired
     private PostRepository postRepository;
+    
+    @Autowired
+    private CommentMapper commentMapper;
     
     // Create a new comment
     public CommentDto createComment(CreateCommentDto createCommentDto) {
@@ -58,23 +62,22 @@ public class CommentService {
             throw new IllegalArgumentException("Post not found with id: " + createCommentDto.getPostId());
         }
         
-        // Create new comment
-        Comment comment = new Comment();
-        comment.setContent(createCommentDto.getContent());
+        // Create new comment using mapper
+        Comment comment = commentMapper.toEntity(createCommentDto);
         comment.setUser(user.get());
         comment.setPost(post.get());
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
         
         Comment savedComment = commentRepository.save(comment);
-        return convertToDto(savedComment);
+        return commentMapper.toDto(savedComment);
     }
     
     // Get comment by ID
     public CommentDto getCommentById(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isPresent()) {
-            return convertToDto(comment.get());
+            return commentMapper.toDto(comment.get());
         }
         throw new IllegalArgumentException("Comment not found with id: " + id);
     }
@@ -82,7 +85,7 @@ public class CommentService {
     // Get all comments by post ID
     public List<CommentDto> getCommentsByPostId(String postId) {
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId).stream()
-                .map(this::convertToDto)
+                .map(commentMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -90,13 +93,13 @@ public class CommentService {
     public Page<CommentDto> getCommentsByPostId(String postId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable)
-                .map(this::convertToDto);
+                .map(commentMapper::toDto);
     }
     
     // Get all comments by user ID
     public List<CommentDto> getCommentsByUserId(UUID userId) {
         return commentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::convertToDto)
+                .map(commentMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -104,14 +107,14 @@ public class CommentService {
     public Page<CommentDto> getCommentsByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return commentRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(this::convertToDto);
+                .map(commentMapper::toDto);
     }
     
     // Search comments by content
     public Page<CommentDto> searchComments(String searchTerm, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return commentRepository.findByContentContainingIgnoreCase(searchTerm, pageable)
-                .map(this::convertToDto);
+                .map(commentMapper::toDto);
     }
     
     // Update comment
@@ -128,7 +131,7 @@ public class CommentService {
             comment.setUpdatedAt(LocalDateTime.now());
             
             Comment savedComment = commentRepository.save(comment);
-            return convertToDto(savedComment);
+            return commentMapper.toDto(savedComment);
         }
         throw new IllegalArgumentException("Comment not found with id: " + id);
     }
@@ -162,21 +165,5 @@ public class CommentService {
     // Get comment count by user
     public long getCommentCountByUserId(UUID userId) {
         return commentRepository.countByUserId(userId);
-    }
-    
-    // Convert Comment entity to CommentDto
-    private CommentDto convertToDto(Comment comment) {
-        CommentDto dto = new CommentDto();
-        dto.setId(comment.getId());
-        dto.setContent(comment.getContent());
-        dto.setCreatedAt(comment.getCreatedAt());
-        dto.setUpdatedAt(comment.getUpdatedAt());
-        dto.setUserId(comment.getUser().getId());
-        dto.setUserFirstName(comment.getUser().getFirstName());
-        dto.setUserLastName(comment.getUser().getLastName());
-        dto.setUsername(comment.getUser().getUsername());
-        dto.setPostId(comment.getPost().getId());
-        dto.setReplyCount(comment.getReplies().size());
-        return dto;
     }
 } 

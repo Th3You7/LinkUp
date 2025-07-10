@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import app.com.server.dto.CreateReactionDto;
 import app.com.server.dto.ReactionDto;
+import app.com.server.mapper.ReactionMapper;
 import app.com.server.model.Post;
 import app.com.server.model.Reaction;
 import app.com.server.model.User;
@@ -28,6 +29,9 @@ public class ReactionService {
     
     @Autowired
     private PostRepository postRepository;
+    
+    @Autowired
+    private ReactionMapper reactionMapper;
     
     // Create a new reaction
     public ReactionDto createReaction(CreateReactionDto createReactionDto) {
@@ -59,21 +63,20 @@ public class ReactionService {
             throw new IllegalArgumentException("User has already reacted to this post");
         }
         
-        // Create new reaction
-        Reaction reaction = new Reaction();
-        reaction.setName(createReactionDto.getName());
+        // Create new reaction using mapper
+        Reaction reaction = reactionMapper.toEntity(createReactionDto);
         reaction.setUser(user.get());
         reaction.setPost(post.get());
         
         Reaction savedReaction = reactionRepository.save(reaction);
-        return convertToDto(savedReaction);
+        return reactionMapper.toDto(savedReaction);
     }
     
     // Get reaction by ID
     public ReactionDto getReactionById(String id) {
         Optional<Reaction> reaction = reactionRepository.findById(id);
         if (reaction.isPresent()) {
-            return convertToDto(reaction.get());
+            return reactionMapper.toDto(reaction.get());
         }
         throw new IllegalArgumentException("Reaction not found with id: " + id);
     }
@@ -81,28 +84,28 @@ public class ReactionService {
     // Get all reactions by post ID
     public List<ReactionDto> getReactionsByPostId(String postId) {
         return reactionRepository.findByPostId(postId).stream()
-                .map(this::convertToDto)
+                .map(reactionMapper::toDto)
                 .collect(Collectors.toList());
     }
     
     // Get all reactions by user ID
     public List<ReactionDto> getReactionsByUserId(UUID userId) {
         return reactionRepository.findByUserId(userId).stream()
-                .map(this::convertToDto)
+                .map(reactionMapper::toDto)
                 .collect(Collectors.toList());
     }
     
     // Get reactions by post ID and reaction name
     public List<ReactionDto> getReactionsByPostIdAndName(String postId, String name) {
         return reactionRepository.findByPostIdAndName(postId, name).stream()
-                .map(this::convertToDto)
+                .map(reactionMapper::toDto)
                 .collect(Collectors.toList());
     }
     
     // Get reactions by reaction name
     public List<ReactionDto> getReactionsByName(String name) {
         return reactionRepository.findByName(name).stream()
-                .map(this::convertToDto)
+                .map(reactionMapper::toDto)
                 .collect(Collectors.toList());
     }
     
@@ -115,7 +118,7 @@ public class ReactionService {
     public ReactionDto getUserReactionToPost(String postId, UUID userId) {
         Optional<Reaction> reaction = reactionRepository.findByPostIdAndUserId(postId, userId);
         if (reaction.isPresent()) {
-            return convertToDto(reaction.get());
+            return reactionMapper.toDto(reaction.get());
         }
         return null;
     }
@@ -132,7 +135,7 @@ public class ReactionService {
             }
             
             Reaction savedReaction = reactionRepository.save(reaction);
-            return convertToDto(savedReaction);
+            return reactionMapper.toDto(savedReaction);
         }
         throw new IllegalArgumentException("Reaction not found with id: " + id);
     }
@@ -181,18 +184,5 @@ public class ReactionService {
     // Get reaction count by post and reaction name
     public long getReactionCountByPostIdAndName(String postId, String name) {
         return reactionRepository.countByPostIdAndName(postId, name);
-    }
-    
-    // Convert Reaction entity to ReactionDto
-    private ReactionDto convertToDto(Reaction reaction) {
-        ReactionDto dto = new ReactionDto();
-        dto.setId(reaction.getId());
-        dto.setName(reaction.getName());
-        dto.setUserId(reaction.getUser().getId());
-        dto.setUserFirstName(reaction.getUser().getFirstName());
-        dto.setUserLastName(reaction.getUser().getLastName());
-        dto.setUsername(reaction.getUser().getUsername());
-        dto.setPostId(reaction.getPost().getId());
-        return dto;
     }
 } 

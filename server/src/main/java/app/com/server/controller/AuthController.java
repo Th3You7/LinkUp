@@ -18,6 +18,8 @@ import app.com.server.dto.CreateUserDto;
 import app.com.server.dto.LoginRequestDto;
 import app.com.server.dto.LoginResponseDto;
 import app.com.server.dto.RegisterResponseDto;
+import app.com.server.dto.UserDto;
+import app.com.server.mapper.UserMapper;
 import app.com.server.model.User;
 import app.com.server.repos.UserRepository;
 import app.com.server.service.UserService;
@@ -35,6 +37,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody CreateUserDto createUserDto) {
@@ -49,12 +52,8 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Email already exists"));
             }
 
-            // Create new user
-            User user = new User();
-            user.setFirstName(createUserDto.getFirstName());
-            user.setLastName(createUserDto.getLastName());
-            user.setUsername(createUserDto.getUsername());
-            user.setEmail(createUserDto.getEmail());
+            // Create new user using mapper
+            User user = userMapper.toEntity(createUserDto);
             user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
 
             User savedUser = userRepository.save(user);
@@ -62,13 +61,15 @@ public class AuthController {
             // Generate JWT token
             String token = jwtUtil.generateToken(savedUser.getUsername());
 
-            // Create response DTO
+            // Create response DTO using mapper
+            UserDto userDto = userMapper.toDto(savedUser);
+
             RegisterResponseDto.UserInfo userInfo = new RegisterResponseDto.UserInfo(
-                savedUser.getId(),
-                savedUser.getUsername(),
-                savedUser.getEmail(),
-                savedUser.getFirstName(),
-                savedUser.getLastName()
+                userDto.getId(),
+                userDto.getUsername(),
+                userDto.getEmail(),
+                userDto.getFirstName(),
+                userDto.getLastName()
             );
 
             RegisterResponseDto response = new RegisterResponseDto(
@@ -102,13 +103,15 @@ public class AuthController {
             User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Create response DTO
+            // Create response DTO using mapper
+            UserDto userDto = userMapper.toDto(user);
+
             LoginResponseDto.UserInfo userInfo = new LoginResponseDto.UserInfo(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName()
+                userDto.getId(),
+                userDto.getUsername(),
+                userDto.getEmail(),
+                userDto.getFirstName(),
+                userDto.getLastName()
             );
 
             LoginResponseDto response = new LoginResponseDto(
