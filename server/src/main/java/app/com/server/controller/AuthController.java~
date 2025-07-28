@@ -88,7 +88,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
         try {
             if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Username and password are required"));
+                return ResponseEntity.badRequest().body(Map.of("error", "Username and password are required"));
             }
 
             // Authenticate user
@@ -122,7 +122,7 @@ public class AuthController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid username or password"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid username or password"));
         }
     }
 } 
