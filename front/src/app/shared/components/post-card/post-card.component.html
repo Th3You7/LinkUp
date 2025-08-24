@@ -1,0 +1,128 @@
+<div
+  class="w-full flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm"
+>
+  <div class="p-0 w-full">
+    <!-- Post Header -->
+    <header
+      class="flex items-center justify-between px-4 py-2 relative self-stretch w-full flex-[0_1_auto]"
+    >
+      <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
+        <div class="w-12 h-12 rounded-full overflow-hidden">
+          <img
+            [src]="post.user.avatar"
+            alt="Male avatar"
+            class="w-full h-full object-cover"
+          />
+        </div>
+
+        <div
+          class="flex flex-col w-[95px] items-center justify-center gap-1 relative"
+        >
+          <div
+            class="relative self-stretch mt-[-1.00px] font-medium text-[#383740] text-base tracking-[0] leading-[normal]"
+          >
+            {{ post.user.name }}
+          </div>
+
+          <div
+            class="relative self-stretch font-normal text-[#adb3b7] text-xs tracking-[0] leading-[normal]"
+          >
+            {{ post.user.timestamp }}
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="h-auto p-0 hover:bg-gray-100 rounded-full p-1 transition-colors duration-200"
+      >
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+          ></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Post Image -->
+    <div class="relative self-stretch w-full h-[600px] bg-[#c4c4c4]"></div>
+
+    <!-- Post Actions -->
+    <div
+      class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]"
+    >
+      <!-- Like/Comment Counts -->
+      <div
+        class="flex items-center justify-between px-4 py-3 relative self-stretch w-full flex-[0_0_auto] border-b border-solid border-[#adb3b7]"
+      >
+        <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
+          <fa-icon
+            [icon]="faHeart"
+            class="w-6 h-6 text-red-500 flex-shrink-0"
+          ></fa-icon>
+
+          <div
+            class="font-normal text-black text-sm tracking-[0] leading-[normal]"
+          >
+            {{ post.likes }}
+          </div>
+        </div>
+
+        <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
+          <div
+            class="font-normal text-black text-sm tracking-[0] leading-[normal]"
+          >
+            {{ post.comments }}
+          </div>
+
+          <fa-icon
+            [icon]="faComment"
+            class="w-6 h-6 text-blue-500 flex-shrink-0"
+          ></fa-icon>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div
+        class="flex items-center justify-between px-4 py-2 relative self-stretch w-full flex-[0_0_auto]"
+      >
+        <button
+          class="flex justify-center gap-3 flex-1 grow items-center relative h-auto hover:bg-gray-50 rounded-lg p-3 transition-colors duration-200"
+        >
+          <fa-icon
+            [icon]="faThumbsUp"
+            class="w-7 h-7 text-[#adb3b7] flex-shrink-0"
+          ></fa-icon>
+
+          <div
+            class="font-semibold text-[#adb3b7] text-base tracking-[0] leading-[normal] whitespace-nowrap"
+          >
+            Like
+          </div>
+        </button>
+
+        <button
+          class="flex justify-center gap-3 flex-1 grow items-center relative h-auto hover:bg-gray-50 rounded-lg p-3 transition-colors duration-200"
+        >
+          <fa-icon
+            [icon]="faComment"
+            class="w-7 h-7 text-[#adb3b7] flex-shrink-0"
+          ></fa-icon>
+
+          <div
+            class="font-semibold text-[#adb3b7] text-base tracking-[0] leading-[normal] whitespace-nowrap"
+          >
+            Comment
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
