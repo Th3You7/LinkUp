@@ -1,0 +1,253 @@
+<!-- Create Post Input Area -->
+<div class="w-full mb-6 create-post-container">
+  <div
+    class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 create-post-input-area"
+  >
+    <div class="flex items-center gap-3">
+      <div
+        class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"
+      >
+        <svg
+          class="w-5 h-5 text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          ></path>
+        </svg>
+      </div>
+      <div
+        (click)="openModal()"
+        class="flex-1 bg-gray-100 rounded-full px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+      >
+        <span class="text-gray-500 text-sm">What's on your mind, Uness?</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div
+      class="flex items-center justify-center gap-x-12 mt-4 pt-4 border-t border-gray-200 create-post-action-buttons"
+    >
+      <button
+        class="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+      >
+        <div
+          class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center"
+        >
+          <svg
+            class="w-4 h-4 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+        </div>
+        <span class="text-sm">Live video</span>
+      </button>
+
+      <button
+        (click)="openModal()"
+        class="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+      >
+        <div
+          class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
+        >
+          <svg
+            class="w-4 h-4 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
+            />
+          </svg>
+        </div>
+        <span class="text-sm">Photo/video</span>
+      </button>
+
+      <button
+        class="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+      >
+        <div
+          class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center"
+        >
+          <svg
+            class="w-4 h-4 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+        </div>
+        <span class="text-sm">Reel</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Overlay -->
+<div
+  *ngIf="isModalOpen"
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-overlay"
+  (click)="closeModal()"
+>
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden modal-content"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-900">Create Post</h2>
+      <button
+        (click)="closeModal()"
+        class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-4 space-y-4">
+      <!-- Post Content Textarea -->
+      <div>
+        <textarea
+          [(ngModel)]="postContent"
+          placeholder="What's on your mind, Uness?"
+          class="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+        ></textarea>
+      </div>
+
+      <!-- Media Upload Area -->
+      <div
+        class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50"
+        [class.border-blue-500]="dragOver"
+        [class.bg-blue-50]="dragOver"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <div class="space-y-2">
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            stroke="currentColor"
+            fill="none"
+            viewBox="0 0 48 48"
+          >
+            <path
+              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <div class="text-gray-600">
+            <label for="file-upload" class="cursor-pointer">
+              <span class="font-medium text-blue-600 hover:text-blue-500"
+                >Click to upload</span
+              >
+              <span class="text-gray-500"> or drag and drop</span>
+            </label>
+            <input
+              id="file-upload"
+              name="file-upload"
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              (change)="onFileSelected($event)"
+              class="sr-only"
+            />
+          </div>
+          <p class="text-xs text-gray-500">
+            PNG, JPG, GIF, MP4, AVI up to 10MB
+          </p>
+        </div>
+      </div>
+
+      <!-- Selected Files Preview -->
+      <div *ngIf="selectedFiles.length > 0" class="space-y-3">
+        <h3 class="text-sm font-medium text-gray-700">Selected Files:</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div
+            *ngFor="let file of selectedFiles; let i = index"
+            class="relative group"
+          >
+            <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
+              <img
+                *ngIf="getFileType(file) === 'image'"
+                [src]="getFilePreview(file)"
+                [alt]="file.name"
+                class="w-full h-full object-cover"
+              />
+              <video
+                *ngIf="getFileType(file) === 'video'"
+                [src]="getFilePreview(file)"
+                class="w-full h-full object-cover"
+                controls
+              ></video>
+            </div>
+            <button
+              (click)="removeFile(i)"
+              class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+            <p class="text-xs text-gray-600 mt-1 truncate">{{ file.name }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div
+      class="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50"
+    >
+      <button
+        (click)="closeModal()"
+        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="createPost()"
+        [disabled]="!postContent.trim() && selectedFiles.length === 0"
+        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        Post
+      </button>
+    </div>
+  </div>
+</div>

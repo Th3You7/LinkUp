@@ -32,6 +32,9 @@
   </nav>
 
   <div class="flex flex-col items-center gap-16 relative self-stretch w-full">
+    <!-- Create Post Section -->
+    <app-create-post></app-create-post>
+
     <!-- Avatar Users -->
     <div class="inline-flex items-center gap-8 relative flex-[0_0_auto]">
       <div
@@ -59,12 +62,37 @@
     <div
       class="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]"
     >
+      <!-- Loading State -->
+      <div *ngIf="loading$ | async" class="w-full text-center py-8">
+        <p class="text-gray-500">Loading posts...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error$ | async" class="w-full text-center py-8">
+        <p class="text-red-500">Error: {{ error$ | async }}</p>
+      </div>
+
+      <!-- Posts List -->
       <app-post-card
-        *ngFor="let post of posts; let i = index"
+        *ngFor="let post of (posts$ | async) || []; let i = index"
         [post]="post"
+        [loading]="loading$ | async"
+        [error]="error$ | async"
         [index]="i"
         class="flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm w-full"
       ></app-post-card>
+
+      <!-- No Posts State -->
+      <div
+        *ngIf="
+          !(loading$ | async) &&
+          !(error$ | async) &&
+          ((posts$ | async) || []).length === 0
+        "
+        class="w-full text-center py-8"
+      >
+        <p class="text-gray-500">No posts available.</p>
+      </div>
     </div>
   </div>
 </div>

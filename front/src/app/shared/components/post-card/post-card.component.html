@@ -9,8 +9,8 @@
       <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
         <div class="w-12 h-12 rounded-full overflow-hidden">
           <img
-            [src]="post.user.avatar"
-            alt="Male avatar"
+            [src]="post.image"
+            alt="Avatar"
             class="w-full h-full object-cover"
           />
         </div>
@@ -21,19 +21,23 @@
           <div
             class="relative self-stretch mt-[-1.00px] font-medium text-[#383740] text-base tracking-[0] leading-[normal]"
           >
-            {{ post.user.name }}
+            {{ post.userLastName }} {{ post.userFirstName }}
           </div>
 
           <div
             class="relative self-stretch font-normal text-[#adb3b7] text-xs tracking-[0] leading-[normal]"
           >
-            {{ post.user.timestamp }}
+            {{ post.createdAt | date : "dd/MM/yyyy" }}
+            {{ post.createdAt | date : "HH:mm" }}
           </div>
         </div>
       </div>
 
       <button
-        class="h-auto p-0 hover:bg-gray-100 rounded-full p-1 transition-colors duration-200"
+        *ngIf="isPostOwner()"
+        (click)="toggleDropdown($event)"
+        class="h-auto hover:bg-gray-100 rounded-full p-1 transition-colors duration-200 dropdown-container"
+        title="Post actions"
       >
         <svg
           class="w-4 h-4"
@@ -48,11 +52,37 @@
             d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
           ></path>
         </svg>
+
+        <!-- Dropdown Menu -->
+        <div *ngIf="isDropdownOpen" class="dropdown-menu">
+          <button (click)="onEditPost()" class="dropdown-button">
+            <fa-icon [icon]="faEdit" class="dropdown-icon"></fa-icon>
+            Edit
+          </button>
+          <button (click)="onDeletePost()" class="dropdown-button delete">
+            <fa-icon [icon]="faTrash" class="dropdown-icon"></fa-icon>
+            Delete
+          </button>
+        </div>
       </button>
     </header>
 
     <!-- Post Image -->
-    <div class="relative self-stretch w-full h-[600px] bg-[#c4c4c4]"></div>
+    <div
+      class="relative self-stretch w-full h-[600px] bg-black flex items-center justify-center"
+    >
+      <img
+        *ngIf="post.image"
+        [src]="post.image"
+        alt="Post Image"
+        class="w-full h-full object-cover"
+      />
+      <span
+        *ngIf="!post.image"
+        class="text-white text-shadow-md text-center text-5xl font-bold"
+        >{{ post.content }}</span
+      >
+    </div>
 
     <!-- Post Actions -->
     <div
@@ -71,7 +101,7 @@
           <div
             class="font-normal text-black text-sm tracking-[0] leading-[normal]"
           >
-            {{ post.likes }}
+            {{ post.reactionCount }}
           </div>
         </div>
 
@@ -79,7 +109,7 @@
           <div
             class="font-normal text-black text-sm tracking-[0] leading-[normal]"
           >
-            {{ post.comments }}
+            {{ post.commentCount }}
           </div>
 
           <fa-icon

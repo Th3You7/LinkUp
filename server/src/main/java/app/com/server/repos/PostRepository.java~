@@ -19,8 +19,6 @@ public interface PostRepository extends JpaRepository<Post, String> {
 
 
     //void deletePostById(String id);
-
-    void deleteByUser(User user);
     
     // Find all posts by a specific user
     List<Post> findByUserOrderByCreatedAtDesc(User user);

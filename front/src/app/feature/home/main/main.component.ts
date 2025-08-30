@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostCardComponent } from '../../../shared/components/post-card/post-card.component';
+import { CreatePostComponent } from '../../../shared/components/create-post/create-post.component';
+import { PostService } from '../../../core/services/post.service';
 
 interface NavigationItem {
   icon: string;
@@ -12,24 +14,31 @@ interface AvatarUser {
   alt: string;
 }
 
-interface Post {
-  user: {
-    name: string;
-    avatar: string;
-    timestamp: string;
-  };
-  likes: string;
-  comments: string;
-}
-
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule, PostCardComponent],
+  imports: [CommonModule, PostCardComponent, CreatePostComponent],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css',
 })
 export class MainComponent {
+  private postService = inject(PostService);
+
+  posts$ = this.postService.posts$;
+  loading$ = this.postService.loading$;
+  error$ = this.postService.error$;
+
+  ngOnInit(): void {
+    this.postService.getPosts().subscribe({
+      next: (posts) => {
+        console.log(posts);
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    });
+  }
+
   navigationItems: NavigationItem[] = [
     { icon: 'home', isActive: true },
     { icon: 'user', isActive: false },
@@ -44,36 +53,6 @@ export class MainComponent {
     { src: '/male-avatar-16.png', alt: 'Male avatar' },
     { src: '/male-avatar-16.png', alt: 'Male avatar' },
     { src: '/male-avatar-16.png', alt: 'Male avatar' },
-  ];
-
-  posts: Post[] = [
-    {
-      user: {
-        name: 'Uness B',
-        avatar: '/male-avatar-16.png',
-        timestamp: 'April 22 at 23:00',
-      },
-      likes: 'You and 550',
-      comments: '330',
-    },
-    {
-      user: {
-        name: 'Uness B',
-        avatar: '/male-avatar-16.png',
-        timestamp: 'April 22 at 23:00',
-      },
-      likes: 'You and 550',
-      comments: '330',
-    },
-    {
-      user: {
-        name: 'Uness B',
-        avatar: '/male-avatar-16.png',
-        timestamp: 'April 22 at 23:00',
-      },
-      likes: 'You and 550',
-      comments: '330',
-    },
   ];
 
   getIconClass(iconName: string): string {
