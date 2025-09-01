@@ -1,4 +1,11 @@
-import { Component, Input, HostListener, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -26,6 +33,7 @@ export class PostCardComponent {
   @Input() index!: number;
   @Input() loading: boolean | null = false;
   @Input() error: string | null = null;
+  @Output() openPostPreview = new EventEmitter<Post>();
 
   // Font Awesome icons for reactions and comments
   faHeart = faHeart;
@@ -59,6 +67,20 @@ export class PostCardComponent {
   toggleDropdown(event: Event): void {
     event.stopPropagation();
     this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  onPostClick(event: Event): void {
+    // Don't open modal if clicking on dropdown or action buttons
+    const target = event.target as HTMLElement;
+    if (
+      target.closest('.dropdown-container') ||
+      target.closest('button') ||
+      target.closest('.post-actions')
+    ) {
+      return;
+    }
+
+    this.openPostPreview.emit(this.post);
   }
 
   onEditPost(): void {

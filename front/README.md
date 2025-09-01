@@ -1,59 +1,103 @@
-# Front
+# LinkUp Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
+A modern social media application built with Angular 17 and Tailwind CSS.
 
-## Development server
+## Features
 
-To start a local development server, run:
+### Post Preview Modal
 
-```bash
-ng serve
-```
+- **Click to Open**: Click on any post content or image to open a detailed preview modal
+- **Comments System**: View all comments for a post in real-time
+- **Add Comments**: Write and submit new comments with a rich input interface
+- **Delete Comments**: Comment owners and post owners can delete comments
+- **Responsive Design**: Modal adapts to different screen sizes
+- **Dark Theme**: Beautiful dark mode interface matching modern social media platforms
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Post Management
 
-## Code scaffolding
+- Create new posts with text and images
+- Edit and delete your own posts
+- Like and comment on posts
+- Real-time updates
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Authentication
 
-```bash
-ng generate component component-name
-```
+- User registration and login
+- Password reset functionality
+- Secure token-based authentication
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Getting Started
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+1. Install dependencies:
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+2. Start the development server:
 
 ```bash
-ng e2e
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+3. Open your browser and navigate to `http://localhost:4200`
 
-## Additional Resources
+## Post Preview Modal Usage
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The post preview modal provides a comprehensive view of posts with full comment functionality:
+
+### Opening the Modal
+
+- Click anywhere on a post card (except action buttons)
+- The modal will open with the post content and all comments
+
+### Comment Features
+
+- **View Comments**: All comments are loaded automatically
+- **Add Comments**: Use the input field at the bottom to add new comments
+- **Delete Comments**: Click the three dots (⋯) next to comments you can delete
+- **Comment Actions**: Use emoji, image, GIF, and sticker buttons for rich comments
+
+### Modal Controls
+
+- **Close**: Click the X button or click outside the modal
+- **Scroll**: Comments section is scrollable for long comment threads
+- **Sort**: Use the dropdown to sort comments by relevance, newest, or oldest
+
+## Technical Details
+
+### Components
+
+- `PostPreviewComponent`: Main modal component with comment functionality
+- `PostCardComponent`: Enhanced with click-to-open modal functionality
+- `MainComponent`: Manages modal state and post interactions
+
+### Services
+
+- `CommentService`: Handles all comment CRUD operations
+- `PostService`: Manages post data and operations
+- `AuthService`: User authentication and current user management
+
+### Styling
+
+- Tailwind CSS for responsive design
+- Custom animations and transitions
+- Dark theme optimized for readability
+
+## API Integration
+
+The modal integrates with the backend API for:
+
+- Loading comments by post ID
+- Creating new comments
+- Deleting comments (with proper authorization)
+- Real-time state management
+
+## Future Enhancements
+
+- Real-time comment updates using WebSocket
+- Comment editing functionality
+- Comment reactions (like, love, etc.)
+- Comment replies and threading
+- Image upload in comments
+- Comment moderation tools

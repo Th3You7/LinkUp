@@ -1,0 +1,245 @@
+<!-- Modal Backdrop -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+  (click)="onBackdropClick($event)"
+>
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-lg max-w-xl w-full max-h-[90vh] overflow-y-scroll shadow-2xl"
+  >
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+      <h2 class="text-gray-800 text-lg font-semibold">
+        {{ post?.userLastName }} {{ post?.userFirstName }}'s Post
+      </h2>
+      <button
+        (click)="onCloseModal()"
+        class="text-gray-500 hover:text-gray-700 transition-colors duration-200 p-2 rounded-full hover:bg-gray-100"
+      >
+        <fa-icon [icon]="faTimes" class="w-5 h-5"></fa-icon>
+      </button>
+    </div>
+
+    <!-- Post Content -->
+    <div class="bg-gray-50">
+      <!-- Post Header -->
+      <div class="flex items-center gap-3 mb-4 p-6 pb-0">
+        <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-300">
+          <img
+            [src]="getAvatarUrl(post?.image)"
+            (error)="onImageError($event)"
+            alt="Profile"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div class="flex-1">
+          <div class="text-gray-800 font-medium">
+            {{ post?.userLastName }} {{ post?.userFirstName }}
+          </div>
+          <div class="text-gray-500 text-sm">
+            {{ post?.createdAt | date : "MMM dd, yyyy" }}
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="relative self-stretch w-full h-[600px] bg-black flex items-center justify-center"
+      >
+        <img
+          *ngIf="post?.image"
+          [src]="post?.image"
+          alt="Post Image"
+          class="w-full h-full object-cover"
+        />
+        <span
+          *ngIf="!post?.image"
+          class="text-white text-shadow-md text-center text-5xl font-bold"
+          >{{ post?.content }}</span
+        >
+      </div>
+
+      <!-- Post Image -->
+    </div>
+
+    <!-- Interaction Bar -->
+    <div class="bg-white px-6 py-3 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <!-- Left side - Reactions -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center">
+            <div
+              class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center -mr-1"
+            >
+              <fa-icon
+                [icon]="faHeart"
+                class="w-2 h-2 flex justify-center items-center text-white"
+              ></fa-icon>
+            </div>
+          </div>
+          <span class="text-gray-600 text-sm">{{
+            post?.reactionCount || 0
+          }}</span>
+        </div>
+
+        <!-- Right side - Comments -->
+        <div class="flex items-center gap-4 text-gray-600 text-sm">
+          <span>{{ post?.commentCount || 0 }} comments</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="bg-white px-6 py-2 border-b border-gray-200">
+      <div class="flex items-center justify-center">
+        <button
+          class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-200 py-2 px-16 rounded-lg hover:bg-gray-50"
+        >
+          <fa-icon [icon]="faThumbsUp" class="w-5 h-5"></fa-icon>
+          <span>Like</span>
+        </button>
+        <button
+          class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-200 py-2 px-16 rounded-lg hover:bg-gray-50"
+        >
+          <fa-icon [icon]="faComment" class="w-5 h-5"></fa-icon>
+          <span>Comment</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="bg-gray-50 flex-1 overflow-y-auto">
+      <!-- Comments Header -->
+      <div class="px-6 py-3 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <select
+            class="bg-white text-gray-700 text-sm border border-gray-300 rounded px-2 py-1"
+          >
+            <option>Newest</option>
+            <option>Oldest</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Comments List -->
+      <div class="px-6 py-4 space-y-4">
+        <!-- Loading State -->
+        <div *ngIf="$commentsLoading | async" class="flex justify-center py-8">
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
+          ></div>
+        </div>
+
+        <!-- Error State -->
+        <div
+          *ngIf="$commentsError | async"
+          class="text-red-500 text-center py-4"
+        >
+          {{ $commentsError | async }}
+        </div>
+
+        <!-- Comments -->
+        <div *ngFor="let comment of $comments | async" class="flex gap-3">
+          <!-- Comment Avatar -->
+          <div
+            class="w-8 h-8 rounded-full overflow-hidden bg-gray-300 flex-shrink-0"
+          >
+            <img
+              (error)="onImageError($event)"
+              alt="User avatar"
+              class="w-full h-full object-cover"
+            />
+          </div>
+
+          <!-- Comment Content -->
+          <div class="flex-1">
+            <div class="bg-white rounded-lg p-3 border border-gray-200">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-gray-800 font-medium text-sm">
+                  {{ comment.userFirstName }} {{ comment.userLastName }}
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="text-gray-500 text-xs">{{
+                    getTimeAgo(comment.createdAt)
+                  }}</span>
+                  <button
+                    *ngIf="canDeleteComment(comment)"
+                    (click)="toggleCommentOptions(comment.id)"
+                    class="text-gray-500 hover:text-gray-700 transition-colors duration-200 p-1 rounded"
+                  >
+                    <fa-icon [icon]="faEllipsisV" class="w-3 h-3"></fa-icon>
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-700 text-sm">{{ comment.content }}</p>
+            </div>
+
+            <!-- Comment Options Dropdown -->
+            <div *ngIf="showCommentOptions === comment.id" class="relative">
+              <div
+                class="absolute right-0 top-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10"
+              >
+                <button
+                  (click)="deleteComment(comment.id)"
+                  class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-gray-50 w-full text-left"
+                >
+                  <fa-icon [icon]="faTrash" class="w-4 h-4"></fa-icon>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Comments -->
+        <div
+          *ngIf="
+            !$commentsLoading &&
+            !$commentsError &&
+            ($comments | async)?.length === 0
+          "
+          class="text-center py-8 text-gray-500"
+        >
+          No comments yet. Be the first to comment!
+        </div>
+      </div>
+    </div>
+
+    <!-- Comment Input -->
+    <div class="bg-white p-4 border-t border-gray-200">
+      <div class="flex gap-3">
+        <!-- User Avatar -->
+        <div
+          class="w-8 h-8 rounded-full overflow-hidden bg-gray-300 flex-shrink-0"
+        >
+          <img
+            [src]="getAvatarUrl(currentUser?.avatar)"
+            (error)="onImageError($event)"
+            alt="Your avatar"
+            class="w-full h-full object-cover"
+          />
+        </div>
+
+        <!-- Comment Input Field -->
+        <div class="flex-1">
+          <div class="relative">
+            <input
+              [(ngModel)]="newComment"
+              (keyup.enter)="submitComment()"
+              type="text"
+              placeholder="Write a comment..."
+              class="w-full bg-gray-100 text-gray-800 placeholder-gray-500 text-sm outline-none rounded-full py-3 px-4 pr-12"
+            />
+            <button
+              (click)="submitComment()"
+              [disabled]="!newComment.trim()"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-600 disabled:text-gray-400 transition-colors duration-200 p-2 rounded-full hover:bg-gray-200"
+            >
+              <fa-icon [icon]="faPaperPlane" class="w-4 h-4"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

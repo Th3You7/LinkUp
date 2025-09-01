@@ -5,8 +5,12 @@ export interface Comment {
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  user: User;
+  userFirstName: string;
+  userLastName: string;
+  username: string;
+  userId: string;
   postId: string;
+  replyCount: number;
 }
 
 export interface CreateCommentData {

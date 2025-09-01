@@ -2,7 +2,10 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostCardComponent } from '../../../shared/components/post-card/post-card.component';
 import { CreatePostComponent } from '../../../shared/components/create-post/create-post.component';
+import { PostPreviewComponent } from '../post-preview/post-preview.component';
 import { PostService } from '../../../core/services/post.service';
+import { CommentService } from '../../../core/services/comment.service';
+import { Post } from '../../../core/models/post.model';
 
 interface NavigationItem {
   icon: string;
@@ -17,16 +20,30 @@ interface AvatarUser {
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule, PostCardComponent, CreatePostComponent],
+  imports: [
+    CommonModule,
+    PostCardComponent,
+    CreatePostComponent,
+    PostPreviewComponent,
+  ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css',
 })
 export class MainComponent {
   private postService = inject(PostService);
+  private commentService = inject(CommentService);
 
   posts$ = this.postService.posts$;
   loading$ = this.postService.loading$;
   error$ = this.postService.error$;
+
+  comments$ = this.commentService.comments$;
+  commentsLoading$ = this.commentService.commentsLoading$;
+  commentsError$ = this.commentService.commentsError$;
+
+  // Post preview modal state
+  selectedPost: Post | null = null;
+  isPostPreviewOpen = false;
 
   ngOnInit(): void {
     this.postService.getPosts().subscribe({
@@ -37,6 +54,16 @@ export class MainComponent {
         console.log(error);
       },
     });
+  }
+
+  onOpenPostPreview(post: Post): void {
+    this.selectedPost = post;
+    this.isPostPreviewOpen = true;
+  }
+
+  onClosePostPreview(): void {
+    this.isPostPreviewOpen = false;
+    this.selectedPost = null;
   }
 
   navigationItems: NavigationItem[] = [

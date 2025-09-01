@@ -1,5 +1,6 @@
 <div
-  class="w-full flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm"
+  class="w-full flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200"
+  (click)="onPostClick($event)"
 >
   <div class="p-0 w-full">
     <!-- Post Header -->
@@ -9,7 +10,10 @@
       <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
         <div class="w-12 h-12 rounded-full overflow-hidden">
           <img
-            [src]="post.image"
+            [src]="
+              post.image ||
+              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjQiIGZpbGw9IiM2QjcyODAiLz4KPHBhdGggZD0iTTI0IDEyQzI2LjYxNDIgMTIgMjggMTMuMzg1OCAyOCAxNkMyOCAxOC42MTQyIDI2LjYxNDIgMjAgMjQgMjBDMjEuMzg1OCAyMCAyMCAxOC42MTQyIDIwIDE2QzIwIDEzLjM4NTggMjEuMzg1OCAxMiAyNCAxMloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zNCAzNkMzNCAzMS41ODIyIDMwLjQxNzggMjggMjYgMjhIMjJDMTcuNTgyMiAyOCAxNCAzMS41ODIyIDE0IDM2SDM0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+'
+            "
             alt="Avatar"
             class="w-full h-full object-cover"
           />
@@ -86,17 +90,23 @@
 
     <!-- Post Actions -->
     <div
-      class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]"
+      class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto] post-actions"
     >
       <!-- Like/Comment Counts -->
       <div
         class="flex items-center justify-between px-4 py-3 relative self-stretch w-full flex-[0_0_auto] border-b border-solid border-[#adb3b7]"
       >
         <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
-          <fa-icon
-            [icon]="faHeart"
-            class="w-6 h-6 text-red-500 flex-shrink-0"
-          ></fa-icon>
+          <div class="flex items-center">
+            <div
+              class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center -mr-1"
+            >
+              <fa-icon
+                [icon]="faHeart"
+                class="size-1flex justify-center items-center text-white"
+              ></fa-icon>
+            </div>
+          </div>
 
           <div
             class="font-normal text-black text-sm tracking-[0] leading-[normal]"

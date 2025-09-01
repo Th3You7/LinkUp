@@ -79,6 +79,7 @@
         [loading]="loading$ | async"
         [error]="error$ | async"
         [index]="i"
+        (openPostPreview)="onOpenPostPreview($event)"
         class="flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm w-full"
       ></app-post-card>
 
@@ -95,4 +96,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Post Preview Modal -->
+  <app-post-preview
+    *ngIf="selectedPost"
+    [post]="selectedPost"
+    [isOpen]="isPostPreviewOpen"
+    (closeModal)="onClosePostPreview()"
+  ></app-post-preview>
 </div>
