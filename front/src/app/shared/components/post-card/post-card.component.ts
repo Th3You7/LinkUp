@@ -5,6 +5,7 @@ import {
   EventEmitter,
   HostListener,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -19,6 +20,7 @@ import {
 import { Post } from '../../../core/models/post.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { PostService } from '../../../core/services/post.service';
+import { ReactionService } from '../../../core/services/reaction.service';
 import { User } from '../../../core/models/user.model';
 
 @Component({
@@ -28,7 +30,7 @@ import { User } from '../../../core/models/user.model';
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.css',
 })
-export class PostCardComponent {
+export class PostCardComponent implements OnInit {
   @Input() post!: Post;
   @Input() index!: number;
   @Input() loading: boolean | null = false;
@@ -45,10 +47,23 @@ export class PostCardComponent {
 
   isDropdownOpen = false;
   currentUser: User | null = null;
+  hasReacted = false;
+  isReacting = false;
+  reactionCount = 0;
+
   private postService = inject(PostService);
+  private reactionService = inject(ReactionService);
 
   constructor(private authService: AuthService) {
     this.currentUser = this.authService.getCurrentUser();
+  }
+
+  ngOnInit() {
+    this.currentUser = this.authService.getCurrentUser();
+    if (this.post && this.currentUser) {
+      this.checkUserReaction();
+      this.getReactionCount();
+    }
   }
 
   @HostListener('document:click', ['$event'])
@@ -81,6 +96,68 @@ export class PostCardComponent {
     }
 
     this.openPostPreview.emit(this.post);
+  }
+
+  async toggleReaction(event: Event): Promise<void> {
+    event.stopPropagation();
+
+    if (!this.currentUser || !this.post || this.isReacting) return;
+
+    this.isReacting = true;
+
+    try {
+      if (this.hasReacted) {
+        // Remove reaction
+        await this.reactionService
+          .deleteReactionByPostAndUser(this.post.id, this.currentUser.id)
+          .toPromise();
+        this.hasReacted = false;
+        this.reactionCount = Math.max(0, this.reactionCount - 1);
+      } else {
+        // Add reaction
+        await this.reactionService
+          .createReaction({
+            name: 'heart',
+            userId: this.currentUser.id,
+            postId: this.post.id,
+          })
+          .toPromise();
+        this.hasReacted = true;
+        this.reactionCount += 1;
+      }
+    } catch (error) {
+      console.error('Error toggling reaction:', error);
+    } finally {
+      this.isReacting = false;
+    }
+  }
+
+  private async checkUserReaction(): Promise<void> {
+    if (!this.currentUser || !this.post) return;
+
+    try {
+      const result = await this.reactionService
+        .hasUserReactedToPost(this.post.id, this.currentUser.id)
+        .toPromise();
+      this.hasReacted = result || false;
+    } catch (error) {
+      console.error('Error checking user reaction:', error);
+      this.hasReacted = false;
+    }
+  }
+
+  private async getReactionCount(): Promise<void> {
+    if (!this.post) return;
+
+    try {
+      const result = await this.reactionService
+        .getReactionCountByPostIdAndName(this.post.id, 'heart')
+        .toPromise();
+      this.reactionCount = result || 0;
+    } catch (error) {
+      console.error('Error getting reaction count:', error);
+      this.reactionCount = this.post.reactionCount || 0;
+    }
   }
 
   onEditPost(): void {

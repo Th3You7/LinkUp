@@ -111,7 +111,7 @@
           <div
             class="font-normal text-black text-sm tracking-[0] leading-[normal]"
           >
-            {{ post.reactionCount }}
+            {{ reactionCount }}
           </div>
         </div>
 
@@ -134,17 +134,26 @@
         class="flex items-center justify-between px-4 py-2 relative self-stretch w-full flex-[0_0_auto]"
       >
         <button
-          class="flex justify-center gap-3 flex-1 grow items-center relative h-auto hover:bg-gray-50 rounded-lg p-3 transition-colors duration-200"
+          (click)="toggleReaction($event)"
+          [disabled]="isReacting"
+          class="flex justify-center gap-3 flex-1 grow items-center relative h-auto rounded-lg p-3 transition-all duration-200 reaction-button"
+          [class]="
+            hasReacted
+              ? 'text-red-500 hover:bg-red-50 like-pop'
+              : 'hover:bg-gray-50'
+          "
         >
           <fa-icon
-            [icon]="faThumbsUp"
-            class="w-7 h-7 text-[#adb3b7] flex-shrink-0"
+            [icon]="faHeart"
+            class="w-7 h-7 flex-shrink-0 transition-all duration-200"
+            [class]="hasReacted ? 'text-red-500 scale-110' : 'text-[#adb3b7]'"
           ></fa-icon>
 
           <div
-            class="font-semibold text-[#adb3b7] text-base tracking-[0] leading-[normal] whitespace-nowrap"
+            class="font-semibold text-base tracking-[0] leading-[normal] whitespace-nowrap transition-colors duration-200"
+            [class]="hasReacted ? 'text-red-500' : 'text-[#adb3b7]'"
           >
-            Like
+            {{ hasReacted ? "Liked" : "Like" }}
           </div>
         </button>
 

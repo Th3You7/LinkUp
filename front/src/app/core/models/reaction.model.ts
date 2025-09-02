@@ -2,15 +2,16 @@ import { User } from './user.model';
 
 export interface Reaction {
   id: string;
-  type: string;
-  createdAt: Date;
-  updatedAt: Date;
-  user: User;
+  name: string;
+  userId: string;
+  userFirstName: string;
+  userLastName: string;
+  username: string;
   postId: string;
 }
 
 export interface CreateReactionData {
-  type: string;
-  postId: string;
+  name: string;
   userId: string;
+  postId: string;
 }

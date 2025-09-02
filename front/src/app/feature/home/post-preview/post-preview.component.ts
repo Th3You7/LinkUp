@@ -24,6 +24,7 @@ import { Comment } from '../../../core/models/comment.model';
 import { User } from '../../../core/models/user.model';
 import { CommentService } from '../../../core/services/comment.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ReactionService } from '../../../core/services/reaction.service';
 
 @Component({
   selector: 'app-post-preview',
@@ -39,6 +40,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
 
   private commentService = inject(CommentService);
   private authService = inject(AuthService);
+  private reactionService = inject(ReactionService);
 
   // Font Awesome icons
   faTimes = faTimes;
@@ -50,7 +52,6 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   faPaperPlane = faPaperPlane;
 
   // Component state
-
   $comments = this.commentService.comments$;
   $commentsLoading = this.commentService.commentsLoading$;
   $commentsError = this.commentService.commentsError$;
@@ -58,12 +59,19 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   newComment = '';
   currentUser: User | null = null;
   showCommentOptions: string | null = null;
+  hasReacted = false;
+  isReacting = false;
+  reactionCount = 0;
 
   ngOnInit() {
     console.log('hello sir');
     console.log(this.post?.id);
     this.currentUser = this.authService.getCurrentUser();
     this.loadComments();
+    if (this.post && this.currentUser) {
+      this.checkUserReaction();
+      this.getReactionCount();
+    }
   }
 
   ngOnDestroy() {
@@ -91,6 +99,68 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
         console.error('Error loading comments:', error);
       },
     });
+  }
+
+  async toggleReaction(event: Event): Promise<void> {
+    event.stopPropagation();
+
+    if (!this.currentUser || !this.post || this.isReacting) return;
+
+    this.isReacting = true;
+
+    try {
+      if (this.hasReacted) {
+        // Remove reaction
+        await this.reactionService
+          .deleteReactionByPostAndUser(this.post.id, this.currentUser.id)
+          .toPromise();
+        this.hasReacted = false;
+        this.reactionCount = Math.max(0, this.reactionCount - 1);
+      } else {
+        // Add reaction
+        await this.reactionService
+          .createReaction({
+            name: 'heart',
+            userId: this.currentUser.id,
+            postId: this.post.id,
+          })
+          .toPromise();
+        this.hasReacted = true;
+        this.reactionCount += 1;
+      }
+    } catch (error) {
+      console.error('Error toggling reaction:', error);
+    } finally {
+      this.isReacting = false;
+    }
+  }
+
+  private async checkUserReaction(): Promise<void> {
+    if (!this.currentUser || !this.post) return;
+
+    try {
+      const result = await this.reactionService
+        .hasUserReactedToPost(this.post.id, this.currentUser.id)
+        .toPromise();
+      this.hasReacted = result || false;
+    } catch (error) {
+      console.error('Error checking user reaction:', error);
+      this.hasReacted = false;
+    }
+  }
+
+  private async getReactionCount(): Promise<void> {
+    if (!this.post) return;
+
+    try {
+      const result = await this.reactionService
+        .getReactionCountByPostIdAndName(this.post.id, 'heart')
+        .toPromise();
+      this.reactionCount = result || 0;
+    } catch (error) {
+      console.error('Error getting reaction count:', error);
+      this.reactionCount = this.post.reactionCount || 0;
+    }
   }
 
   submitComment() {
