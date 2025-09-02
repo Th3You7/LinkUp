@@ -13,18 +13,19 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Setter
-public class Message {
-
-
+@Getter
+public class ChatParticipant {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String message;
-    private String sender;
-    private Instant createdAt = Instant.now();
     @ManyToOne()
     @JoinColumn(name = "chat_session_id")
     private ChatSession chatSession;
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private User user;
+    private Instant joinedAt = Instant.now();
+    private Instant lastReadAt;
+
 }
