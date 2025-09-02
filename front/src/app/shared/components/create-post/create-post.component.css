@@ -1,0 +1,93 @@
+/* Essential component styles */
+app-create-post {
+  display: block;
+  width: 100%;
+}
+
+/* Custom scrollbar for the modal */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* File preview animations */
+.file-preview {
+  transition: all 0.2s ease-in-out;
+}
+
+.file-preview:hover {
+  transform: scale(1.02);
+}
+
+/* Drag and drop visual feedback */
+.drag-over {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* Button hover effects */
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Modal backdrop blur effect */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .modal-content {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .file-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ensure proper display of all elements */
+.create-post-container {
+  display: block;
+  width: 100%;
+}
+
+.create-post-input-area {
+  display: block;
+  width: 100%;
+}
+
+.create-post-action-buttons {
+  display: flex;
+  width: 100%;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 51;
+}

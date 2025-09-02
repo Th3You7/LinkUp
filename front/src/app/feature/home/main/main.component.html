@@ -1,0 +1,107 @@
+<div
+  class="flex flex-col w-full max-w-[720px] h-full items-center gap-8 px-8 py-4 relative overflow-scroll bg-[#f6f5f8]"
+>
+  <!-- Navigation -->
+  <nav
+    class="inline-flex items-center justify-center gap-4 px-8 py-4 relative flex-[0_0_auto] bg-[#f1f7fc] rounded-2xl"
+  >
+    <button
+      *ngFor="let item of navigationItems; let i = index"
+      (click)="setActiveNavigation(i)"
+      class="inline-flex items-center justify-center gap-2.5 p-4 relative flex-[0_0_auto] rounded-lg h-auto transition-colors duration-200"
+      [class]="
+        item.isActive
+          ? 'bg-[#023093] text-white hover:bg-[#023093]'
+          : 'hover:bg-gray-100'
+      "
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          [attr.d]="getIconClass(item.icon)"
+        ></path>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="flex flex-col items-center gap-16 relative self-stretch w-full">
+    <!-- Create Post Section -->
+    <app-create-post></app-create-post>
+
+    <!-- Avatar Users -->
+    <div class="inline-flex items-center gap-8 relative flex-[0_0_auto]">
+      <div
+        *ngFor="let user of avatarUsers; let i = index"
+        class="inline-flex items-center gap-2.5 p-0.5 relative flex-[0_0_auto] mt-[-4.00px] mb-[-4.00px] rounded-[50px] border-4 border-solid border-[#0655ff]"
+        [class]="
+          i === 0
+            ? 'ml-[-4.00px]'
+            : i === avatarUsers.length - 1
+            ? 'mr-[-4.00px]'
+            : ''
+        "
+      >
+        <div class="w-24 h-24 rounded-full overflow-hidden">
+          <img
+            [src]="user.src"
+            [alt]="user.alt"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <div
+      class="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]"
+    >
+      <!-- Loading State -->
+      <div *ngIf="loading$ | async" class="w-full text-center py-8">
+        <p class="text-gray-500">Loading posts...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error$ | async" class="w-full text-center py-8">
+        <p class="text-red-500">Error: {{ error$ | async }}</p>
+      </div>
+
+      <!-- Posts List -->
+      <app-post-card
+        *ngFor="let post of (posts$ | async) || []; let i = index"
+        [post]="post"
+        [loading]="loading$ | async"
+        [error]="error$ | async"
+        [index]="i"
+        (openPostPreview)="onOpenPostPreview($event)"
+        class="flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm w-full"
+      ></app-post-card>
+
+      <!-- No Posts State -->
+      <div
+        *ngIf="
+          !(loading$ | async) &&
+          !(error$ | async) &&
+          ((posts$ | async) || []).length === 0
+        "
+        class="w-full text-center py-8"
+      >
+        <p class="text-gray-500">No posts available.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Preview Modal -->
+  <app-post-preview
+    *ngIf="selectedPost"
+    [post]="selectedPost"
+    [isOpen]="isPostPreviewOpen"
+    (closeModal)="onClosePostPreview()"
+  ></app-post-preview>
+</div>

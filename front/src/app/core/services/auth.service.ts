@@ -8,6 +8,7 @@ import {
   AuthResponse,
 } from '../models/auth.model';
 import { AppConfig } from '../config/app.config';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -36,5 +37,10 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
+  }
+
+  getCurrentUser(): User | null {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 }

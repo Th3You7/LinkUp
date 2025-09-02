@@ -1,0 +1,177 @@
+<div
+  class="w-full flex flex-col items-start relative flex-[0_1_100%] bg-white rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200"
+  (click)="onPostClick($event)"
+>
+  <div class="p-0 w-full">
+    <!-- Post Header -->
+    <header
+      class="flex items-center justify-between px-4 py-2 relative self-stretch w-full flex-[0_1_auto]"
+    >
+      <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
+        <div class="w-12 h-12 rounded-full overflow-hidden">
+          <img
+            [src]="
+              post.image ||
+              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjQiIGZpbGw9IiM2QjcyODAiLz4KPHBhdGggZD0iTTI0IDEyQzI2LjYxNDIgMTIgMjggMTMuMzg1OCAyOCAxNkMyOCAxOC42MTQyIDI2LjYxNDIgMjAgMjQgMjBDMjEuMzg1OCAyMCAyMCAxOC42MTQyIDIwIDE2QzIwIDEzLjM4NTggMjEuMzg1OCAxMiAyNCAxMloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zNCAzNkMzNCAzMS41ODIyIDMwLjQxNzggMjggMjYgMjhIMjJDMTcuNTgyMiAyOCAxNCAzMS41ODIyIDE0IDM2SDM0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+'
+            "
+            alt="Avatar"
+            class="w-full h-full object-cover"
+          />
+        </div>
+
+        <div
+          class="flex flex-col w-[95px] items-center justify-center gap-1 relative"
+        >
+          <div
+            class="relative self-stretch mt-[-1.00px] font-medium text-[#383740] text-base tracking-[0] leading-[normal]"
+          >
+            {{ post.userLastName }} {{ post.userFirstName }}
+          </div>
+
+          <div
+            class="relative self-stretch font-normal text-[#adb3b7] text-xs tracking-[0] leading-[normal]"
+          >
+            {{ post.createdAt | date : "dd/MM/yyyy" }}
+            {{ post.createdAt | date : "HH:mm" }}
+          </div>
+        </div>
+      </div>
+
+      <button
+        *ngIf="isPostOwner()"
+        (click)="toggleDropdown($event)"
+        class="h-auto hover:bg-gray-100 rounded-full p-1 transition-colors duration-200 dropdown-container"
+        title="Post actions"
+      >
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+          ></path>
+        </svg>
+
+        <!-- Dropdown Menu -->
+        <div *ngIf="isDropdownOpen" class="dropdown-menu">
+          <button (click)="onEditPost()" class="dropdown-button">
+            <fa-icon [icon]="faEdit" class="dropdown-icon"></fa-icon>
+            Edit
+          </button>
+          <button (click)="onDeletePost()" class="dropdown-button delete">
+            <fa-icon [icon]="faTrash" class="dropdown-icon"></fa-icon>
+            Delete
+          </button>
+        </div>
+      </button>
+    </header>
+
+    <!-- Post Image -->
+    <div
+      class="relative self-stretch w-full h-[600px] bg-black flex items-center justify-center"
+    >
+      <img
+        *ngIf="post.image"
+        [src]="post.image"
+        alt="Post Image"
+        class="w-full h-full object-cover"
+      />
+      <span
+        *ngIf="!post.image"
+        class="text-white text-shadow-md text-center text-5xl font-bold"
+        >{{ post.content }}</span
+      >
+    </div>
+
+    <!-- Post Actions -->
+    <div
+      class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto] post-actions"
+    >
+      <!-- Like/Comment Counts -->
+      <div
+        class="flex items-center justify-between px-4 py-3 relative self-stretch w-full flex-[0_0_auto] border-b border-solid border-[#adb3b7]"
+      >
+        <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
+          <div class="flex items-center">
+            <div
+              class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center -mr-1"
+            >
+              <fa-icon
+                [icon]="faHeart"
+                class="size-1flex justify-center items-center text-white"
+              ></fa-icon>
+            </div>
+          </div>
+
+          <div
+            class="font-normal text-black text-sm tracking-[0] leading-[normal]"
+          >
+            {{ reactionCount }}
+          </div>
+        </div>
+
+        <div class="inline-flex gap-2 flex-[0_0_auto] items-center relative">
+          <div
+            class="font-normal text-black text-sm tracking-[0] leading-[normal]"
+          >
+            {{ post.commentCount }}
+          </div>
+
+          <fa-icon
+            [icon]="faComment"
+            class="w-6 h-6 text-blue-500 flex-shrink-0"
+          ></fa-icon>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div
+        class="flex items-center justify-between px-4 py-2 relative self-stretch w-full flex-[0_0_auto]"
+      >
+        <button
+          (click)="toggleReaction($event)"
+          [disabled]="isReacting"
+          class="flex justify-center gap-3 flex-1 grow items-center relative h-auto rounded-lg p-3 transition-all duration-200 reaction-button"
+          [class]="
+            hasReacted
+              ? 'text-red-500 hover:bg-red-50 like-pop'
+              : 'hover:bg-gray-50'
+          "
+        >
+          <fa-icon
+            [icon]="faHeart"
+            class="w-7 h-7 flex-shrink-0 transition-all duration-200"
+            [class]="hasReacted ? 'text-red-500 scale-110' : 'text-[#adb3b7]'"
+          ></fa-icon>
+
+          <div
+            class="font-semibold text-base tracking-[0] leading-[normal] whitespace-nowrap transition-colors duration-200"
+            [class]="hasReacted ? 'text-red-500' : 'text-[#adb3b7]'"
+          >
+            {{ hasReacted ? "Liked" : "Like" }}
+          </div>
+        </button>
+
+        <button
+          class="flex justify-center gap-3 flex-1 grow items-center relative h-auto hover:bg-gray-50 rounded-lg p-3 transition-colors duration-200"
+        >
+          <fa-icon
+            [icon]="faComment"
+            class="w-7 h-7 text-[#adb3b7] flex-shrink-0"
+          ></fa-icon>
+
+          <div
+            class="font-semibold text-[#adb3b7] text-base tracking-[0] leading-[normal] whitespace-nowrap"
+          >
+            Comment
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

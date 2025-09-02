@@ -133,23 +133,24 @@ public class PostService {
     // Delete post
 
     public void deletePost(String id) {
+        Optional<User> user = userRepository.findById(UUID.fromString("0x6F2ECB4D77CD4167BCA52F23F17D9753"));
+        postRepository.deleteByUser(user.get());
 
+//        Optional<Post>  post = postRepository.findById(id);
+//        if(post.isPresent()) {
+//            System.out.println(post.get().getContent());
+//            UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//            if(!post.get().getUser().getEmail().equals(user.getUsername())) {
+//                throw new IllegalArgumentException("You are not authorized to delete this post");
+//            }
+//            System.out.println("deletign post with id: " + id);
+//
+//
+//            System.out.println("done");
+//
+//        }else {
+//            throw new IllegalArgumentException("Post not found with id: " + id);
 
-        Optional<Post>  post = postRepository.findById(id);
-        if(post.isPresent()) {
-            System.out.println(post.get().getContent());
-            UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(!post.get().getUser().getEmail().equals(user.getUsername())) {
-                throw new IllegalArgumentException("You are not authorized to delete this post");
-            }
-            System.out.println("deletign post with id: " + id);
-
-            postRepository.deleteById(id);
-            System.out.println("done");
-
-        }else {
-            throw new IllegalArgumentException("Post not found with id: " + id);
-}
     }
     
     // Delete posts by user ID

@@ -1,0 +1,59 @@
+<div
+  class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 cursor-pointer group"
+>
+  <div class="flex items-center gap-3 flex-1 min-w-0">
+    <!-- Avatar Container -->
+    <div class="relative flex-shrink-0">
+      <div
+        class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 border-2 border-gray-100"
+      >
+        <img
+          *ngIf="friend.avatar"
+          [src]="friend.avatar"
+          [alt]="friend.name"
+          class="w-full h-full object-cover"
+        />
+        <div
+          *ngIf="!friend.avatar"
+          class="w-full h-full flex items-center justify-center bg-blue-500 text-white font-semibold text-sm"
+        >
+          {{ getInitials(friend.name) }}
+        </div>
+      </div>
+
+      <!-- Online Status Indicator -->
+      <div
+        *ngIf="friend.isOnline"
+        class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"
+      ></div>
+    </div>
+
+    <!-- Friend Info -->
+    <div class="flex-1 min-w-0">
+      <div class="font-medium text-gray-900 text-sm truncate">
+        {{ friend.name }}
+      </div>
+      <div
+        *ngIf="!friend.isOnline && friend.lastSeen"
+        class="text-xs text-gray-500 truncate"
+      >
+        {{ friend.lastSeen }}
+      </div>
+      <div *ngIf="friend.isOnline" class="text-xs text-green-600 font-medium">
+        Online
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Menu (Optional) -->
+  <button
+    class="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-gray-200 transition-all duration-200 flex-shrink-0"
+    title="More options"
+  >
+    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+      />
+    </svg>
+  </button>
+</div>
