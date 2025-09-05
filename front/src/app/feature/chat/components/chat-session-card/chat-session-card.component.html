@@ -1,0 +1,57 @@
+<div
+  class="hs-tab-active:bg-gray-100 relative cursor-pointer bg-white hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100"
+  [class.bg-gray-100]="isActive"
+  [id]="chatSession?.id"
+  [attr.aria-selected]="isActive"
+  role="tab"
+  (click)="onClick()"
+>
+  <div class="py-4 px-5 flex items-center gap-x-3 border-b border-b-gray-100">
+    <div class="shrink-0">
+      <div class="relative size-8">
+        <img
+          class="shrink-0 size-8 rounded-full"
+          [src]="chatSession?.avatar || 'assets/default-avatar.png'"
+          [alt]="chatSession?.name + '\'s avatar'"
+        />
+        <span
+          *ngIf="chatSession?.isOnline"
+          class="absolute -bottom-0 -end-0 block size-2 rounded-full ring-2 ring-white bg-green-500"
+        ></span>
+      </div>
+    </div>
+    <div class="grow truncate">
+      <div class="flex justify-between items-center gap-x-1">
+        <p class="truncate font-medium text-[13px] text-gray-800">
+          {{ chatSession?.name }}
+        </p>
+        <div>
+          <svg
+            *ngIf="chatSession?.isVerified"
+            class="inline-block shrink-0 size-3.5 text-blue-600"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 6 7 17l-5-5" />
+            <path d="m22 10-7.5 7.5L13 16" />
+          </svg>
+          <span class="text-[10px] text-gray-400 uppercase">
+            {{ chatSession?.timestamp }}
+          </span>
+        </div>
+      </div>
+      <div class="truncate me-5">
+        <p class="truncate text-gray-500 text-xs">
+          {{ chatSession?.lastMessage }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
