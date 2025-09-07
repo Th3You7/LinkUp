@@ -17,7 +17,7 @@ public class ChatSession {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @OneToOne()
+    @OneToOne(mappedBy = "chatSession")
     @JoinColumn(name = "last_message_id")
     private Message lastMessage;
     @OneToMany(mappedBy = "chatSession", orphanRemoval = true, cascade = CascadeType.ALL)
