@@ -1,7 +1,10 @@
 package app.com.server.repos;
 
-import app.com.server.model.ChatSession;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChatSessionRepository extends JpaRepository<ChatSession, String> {
+import app.com.server.model.ChatSession;
+
+public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> {
 }

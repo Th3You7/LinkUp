@@ -59,7 +59,7 @@ public class ChatService {
 
     @Transactional
     public Page<Message> getMessages(String chatSessionId, int page) {
-        return messageRepository.findByChatSession_IdOrderByCreatedAtDesc(UUID.fromString(chatSessionId), PageRequest.of(page, 10));
+        return messageRepository.findByChatSession_IdOrderBySetCreatedAtDesc(UUID.fromString(chatSessionId), PageRequest.of(page, 10));
     }
 
     @Transactional

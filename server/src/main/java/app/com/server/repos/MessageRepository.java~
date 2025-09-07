@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import app.com.server.model.Message;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
-    Page<Message> findByChatSession_IdOrderByCreatedAtDesc(UUID chatSession_id, Pageable pageable);
+    Page<Message> findByChatSession_IdOrderBySetCreatedAtDesc(UUID chatSession_id, Pageable pageable);
 }
