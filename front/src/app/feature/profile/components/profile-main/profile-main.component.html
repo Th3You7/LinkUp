@@ -1,0 +1,168 @@
+<div class="xl:p-0 flex flex-col space-y-5">
+  <!-- Two Cards Row -->
+  <div class="xl:flex xl:gap-5 gap-y-5">
+    <!-- About Card -->
+    <div
+      class="flex-1 bg-white border border-gray-200 shadow-2xs rounded-xl p-5"
+    >
+      <h2 class="text-sm font-semibold text-gray-800 mb-4">About</h2>
+
+      <!-- List -->
+      <ul class="space-y-2">
+        <li>
+          <div class="inline-flex items-center gap-x-3 text-sm text-gray-800">
+            <svg
+              class="shrink-0 size-4 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" />
+              <path d="M10 10h4" />
+              <path d="M10 14h4" />
+              <path d="M10 18h4" />
+            </svg>
+            Organization
+          </div>
+        </li>
+        <li>
+          <div class="inline-flex items-center gap-x-3 text-sm text-gray-800">
+            <svg
+              class="shrink-0 size-4 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Country
+          </div>
+        </li>
+        <li>
+          <div class="inline-flex items-center gap-x-3 text-sm text-gray-800">
+            <svg
+              class="shrink-0 size-4 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Time zone
+          </div>
+        </li>
+        <li>
+          <div class="inline-flex items-center gap-x-3 text-sm text-gray-800">
+            <svg
+              class="shrink-0 size-4 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="20" height="16" x="2" y="4" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            Email
+          </div>
+        </li>
+      </ul>
+      <!-- End List -->
+    </div>
+
+    <!-- My Posts Card -->
+    <div class="flex-2 bg-white p-5 xl:pt-0">
+      <!-- Create Post Component -->
+      <div class="mb-6">
+        <app-create-post (postCreated)="onPostCreated()"></app-create-post>
+      </div>
+
+      <!-- Posts List -->
+      <div class="space-y-4">
+        <!-- Loading State -->
+        <div *ngIf="loading$ | async" class="text-center py-8">
+          <div
+            class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"
+          ></div>
+          <p class="mt-2 text-sm text-gray-600">Loading posts...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error$ | async as error" class="text-center py-8">
+          <p class="text-sm text-red-600">{{ error }}</p>
+        </div>
+
+        <!-- Posts -->
+        <ng-container *ngIf="posts$ | async as posts">
+          <app-post-card
+            *ngFor="let post of posts; let i = index"
+            [post]="post"
+            [index]="i"
+            [loading]="false"
+            [error]="null"
+          ></app-post-card>
+        </ng-container>
+
+        <!-- Empty State -->
+        <div
+          *ngIf="
+            !(loading$ | async) &&
+            !(error$ | async) &&
+            (posts$ | async)?.length === 0
+          "
+          class="text-center py-12"
+        >
+          <div
+            class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-12 h-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
+          <p class="text-sm text-gray-500">
+            Share your thoughts and experiences with the community!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -282,4 +282,54 @@ export class PostService {
         })
       );
   }
+
+  getPostsByUserId(userId: string): Observable<Post[]> {
+    this.postsState.next({
+      ...this.postsState.value,
+      loading: true,
+      error: null,
+    });
+
+    return this.http
+      .get<any>(`${AppConfig.API_BASE_URL}/posts/user/${userId}`)
+      .pipe(
+        map((response: any) => {
+          // Handle both array and paginated response
+          if (Array.isArray(response)) {
+            return response;
+          } else if (
+            response &&
+            response.content &&
+            Array.isArray(response.content)
+          ) {
+            return response.content;
+          } else {
+            console.warn('Unexpected response format:', response);
+            return [];
+          }
+        }),
+        tap((posts: Post[]) => {
+          console.log('User posts in tap:', posts);
+          this.postsState.next({
+            ...this.postsState.value,
+            posts: posts || [],
+            error: null,
+          });
+        }),
+        catchError((error: any) => {
+          this.postsState.next({
+            ...this.postsState.value,
+            posts: [],
+            error: error.message || 'Failed to fetch user posts',
+          });
+          return throwError(() => error);
+        }),
+        finalize(() => {
+          this.postsState.next({
+            ...this.postsState.value,
+            loading: false,
+          });
+        })
+      );
+  }
 }

@@ -26,4 +26,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/chat/chat.component').then((m) => m.ChatComponent),
   },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./feature/profile/profile.component').then(
+        (m) => m.ProfileComponent
+      ),
+  },
 ];
