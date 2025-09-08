@@ -8,6 +8,22 @@ export class AppConfig {
     REFRESH_TOKEN: `${AppConfig.API_BASE_URL}/auth/refresh`,
   };
 
+  static readonly FRIENDSHIP_ENDPOINTS = {
+    SEND_REQUEST: `${AppConfig.API_BASE_URL}/friendships/send`,
+    ACCEPT_REQUEST: `${AppConfig.API_BASE_URL}/friendships`,
+    REJECT_REQUEST: `${AppConfig.API_BASE_URL}/friendships`,
+    REMOVE_FRIEND: `${AppConfig.API_BASE_URL}/friendships/remove`,
+    BLOCK_USER: `${AppConfig.API_BASE_URL}/friendships/block`,
+    UNBLOCK_USER: `${AppConfig.API_BASE_URL}/friendships/unblock`,
+    GET_FRIENDS: `${AppConfig.API_BASE_URL}/friendships/friends`,
+    GET_PENDING: `${AppConfig.API_BASE_URL}/friendships/pending`,
+    GET_SENT: `${AppConfig.API_BASE_URL}/friendships/sent`,
+    GET_ALL: `${AppConfig.API_BASE_URL}/friendships/all`,
+    GET_STATUS: `${AppConfig.API_BASE_URL}/friendships/status`,
+    CHECK_FRIENDS: `${AppConfig.API_BASE_URL}/friendships/check`,
+    GET_BY_ID: `${AppConfig.API_BASE_URL}/friendships`,
+  };
+
   // Local Storage Keys
   static readonly STORAGE_KEYS = {
     TOKEN: 'token',
