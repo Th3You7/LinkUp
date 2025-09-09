@@ -100,8 +100,8 @@
 
     <!-- My Posts Card -->
     <div class="flex-2 pl-5 xl:pt-0">
-      <!-- Create Post Component -->
-      <div class="mb-6">
+      <!-- Create Post Component - Only show for own profile -->
+      <div *ngIf="isOwnProfile()" class="mb-6">
         <app-create-post (postCreated)="onPostCreated()"></app-create-post>
       </div>
 
@@ -159,7 +159,12 @@
           </div>
           <h3 class="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
           <p class="text-sm text-gray-500">
-            Share your thoughts and experiences with the community!
+            <span *ngIf="isOwnProfile()"
+              >Share your thoughts and experiences with the community!</span
+            >
+            <span *ngIf="!isOwnProfile()"
+              >This user hasn't shared any posts yet.</span
+            >
           </p>
         </div>
       </div>

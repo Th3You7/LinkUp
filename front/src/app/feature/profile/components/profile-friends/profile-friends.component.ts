@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Friendship } from '../../../../core/models/friendship.model';
@@ -12,6 +12,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   styleUrl: './profile-friends.component.css',
 })
 export class ProfileFriendsComponent implements OnInit {
+  @Input() profileUserId: string | null = null;
   private friendshipService = inject(FriendshipService);
   private authService = inject(AuthService);
 
@@ -26,9 +27,9 @@ export class ProfileFriendsComponent implements OnInit {
 
   ngOnInit() {
     // Load friends when component initializes
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.friendshipService.getFriends(currentUser.id).subscribe();
+
+    if (this.profileUserId) {
+      this.friendshipService.getFriends(this.profileUserId).subscribe();
     }
 
     // Add static friends for testing

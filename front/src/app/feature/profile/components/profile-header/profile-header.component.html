@@ -85,13 +85,128 @@
   <div
     class="mt-4 md:mt-7 -mb-0.5 flex flex-col md:flex-row md:justify-between md:items-center gap-3"
   >
-    <div class="md:order-2 flex justify-center md:justify-end">
+    <div class="md:order-2 flex justify-center md:justify-end gap-2">
+      <!-- Edit button for own profile -->
       <a
+        *ngIf="isOwnProfile()"
         class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50"
         href="../../pro/dashboard/account-profile.html"
       >
         Edit
       </a>
+
+      <!-- Friendship buttons for other profiles -->
+      <div *ngIf="!isOwnProfile()" class="flex items-center gap-2">
+        <!-- Add Friend / Unfriend Button -->
+        <button
+          *ngIf="!isBlocked()"
+          (click)="isFriend() ? removeFriend() : addFriend()"
+          [class]="
+            isFriend()
+              ? 'py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-red-200 bg-red-50 text-red-700 shadow-2xs hover:bg-red-100 focus:outline-hidden focus:bg-red-100 cursor-pointer'
+              : 'py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 cursor-pointer'
+          "
+        >
+          <svg
+            *ngIf="!isFriend()"
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            ></path>
+          </svg>
+          <svg
+            *ngIf="isFriend()"
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+          {{ isFriend() ? "Unfriend" : "Add Friend" }}
+        </button>
+
+        <!-- Message Button -->
+        <button
+          *ngIf="!isBlocked()"
+          (click)="startChat()"
+          class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-green-200 bg-green-500 text-white shadow-2xs hover:bg-green-600 focus:outline-hidden focus:bg-green-600 cursor-pointer"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            ></path>
+          </svg>
+          Message
+        </button>
+
+        <!-- Block Dropdown -->
+        <div *ngIf="!isBlocked()" class="relative">
+          <button
+            (click)="toggleBlockDropdown()"
+            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+              ></path>
+            </svg>
+          </button>
+          <div
+            *ngIf="isBlockDropdownOpen"
+            class="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+          >
+            <button
+              (click)="onBlockUser()"
+              class="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+            >
+              Block
+            </button>
+          </div>
+        </div>
+
+        <!-- Unblock Button (when user is blocked) -->
+        <button
+          *ngIf="isBlocked()"
+          (click)="unblockUser()"
+          class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-orange-200 bg-orange-50 text-orange-700 shadow-2xs hover:bg-orange-100 focus:outline-hidden focus:bg-orange-100 cursor-pointer"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
+            ></path>
+          </svg>
+          Unblock
+        </button>
+      </div>
     </div>
 
     <!-- Nav -->

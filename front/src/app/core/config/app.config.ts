@@ -35,7 +35,7 @@ export class AppConfig {
   static readonly ROUTES = {
     LOGIN: '/login',
     REGISTER: '/register',
-    HOME: '/home',
+    HOME: '/',
     PROFILE: '/profile',
   };
 

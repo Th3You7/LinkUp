@@ -5,14 +5,17 @@
 <div class="pt-16 min-h-screen bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <app-profile-header
+      [profileUserId]="getProfileUserId()"
       (currentTabChange)="setCurrentTab($event)"
     ></app-profile-header>
     <div class="mt-8">
       <app-profile-main
         *ngIf="getCurrentTab() === 'my-profile'"
+        [profileUserId]="getProfileUserId()"
       ></app-profile-main>
       <app-profile-friends
         *ngIf="getCurrentTab() === 'friends'"
+        [profileUserId]="getProfileUserId()"
       ></app-profile-friends>
     </div>
   </div>

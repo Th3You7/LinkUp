@@ -42,8 +42,8 @@ export class AuthService {
 
   private initializeAuth() {
     // Try to restore user and token from localStorage
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem(AppConfig.STORAGE_KEYS.TOKEN);
+    const storedUser = localStorage.getItem(AppConfig.STORAGE_KEYS.USER);
 
     if (storedToken && storedUser) {
       try {
@@ -53,8 +53,8 @@ export class AuthService {
       } catch (error) {
         console.error('Error parsing stored user data:', error);
         // Clear invalid data
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem(AppConfig.STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(AppConfig.STORAGE_KEYS.USER);
       }
     }
   }
@@ -84,8 +84,11 @@ export class AuthService {
           this.setUser(response.user as User);
           this.setToken(response.token);
           // Store in localStorage for persistence
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
+          localStorage.setItem(AppConfig.STORAGE_KEYS.TOKEN, response.token);
+          localStorage.setItem(
+            AppConfig.STORAGE_KEYS.USER,
+            JSON.stringify(response.user)
+          );
         }),
         finalize(() => {
           this.setLoading(false);
@@ -102,8 +105,11 @@ export class AuthService {
           this.setUser(response.user as User);
           this.setToken(response.token);
           // Store in localStorage for persistence
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
+          localStorage.setItem(AppConfig.STORAGE_KEYS.TOKEN, response.token);
+          localStorage.setItem(
+            AppConfig.STORAGE_KEYS.USER,
+            JSON.stringify(response.user)
+          );
         }),
         finalize(() => {
           this.setLoading(false);
@@ -112,8 +118,8 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem(AppConfig.STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(AppConfig.STORAGE_KEYS.USER);
     this.setUser(null);
     this.setToken(null);
     this.setLoading(false);

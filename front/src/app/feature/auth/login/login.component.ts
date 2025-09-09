@@ -1,5 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormsModule,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginRequest } from '../../../core/models/auth.model';
@@ -17,10 +22,11 @@ export class LoginComponent {
   authService: AuthService = inject(AuthService);
   router: Router = inject(Router);
 
-  loginForm = this.fb.group({
-    username: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-  });
+  username = new FormControl('', [Validators.required, Validators.email]);
+  password = new FormControl('', [
+    Validators.required,
+    Validators.minLength(6),
+  ]);
 
   showPassword = false;
   rememberMe = false;
@@ -31,23 +37,39 @@ export class LoginComponent {
   }
 
   onLogin() {
-    this.authService.login(this.loginForm.value as LoginRequest).subscribe({
-      next: (response) => {
-        const { token, user } = response;
-        localStorage.setItem(AppConfig.STORAGE_KEYS.TOKEN, token);
-        localStorage.setItem(AppConfig.STORAGE_KEYS.USER, JSON.stringify(user));
-        this.router.navigate([AppConfig.ROUTES.HOME]);
-      },
-      // Show the message error from the backend
-      // Option 1: Set an error message property and display it in the template
-      // (Assumes you will add {{ errorMessage }} in the template)
-      error: (error) => {
-        if (error?.error) {
-          this.errorMessage = error.error.message;
-        } else {
-          this.errorMessage = 'An error occurred during login.';
-        }
-      },
-    });
+    if (this.username.valid && this.password.valid) {
+      this.authService
+        .login({
+          username: this.username.value,
+          password: this.password.value,
+        } as LoginRequest)
+        .subscribe({
+          next: (response) => {
+            // AuthService already handles localStorage and state updates
+            // Just navigate to home after successful login
+            this.router
+              .navigate([AppConfig.ROUTES.HOME])
+              .then(() => {
+                console.log('Navigation to home completed');
+              })
+              .catch((error) => {
+                console.error('Navigation error:', error);
+              });
+          },
+          error: (error) => {
+            console.error('Login error:', error);
+            if (error?.error?.message) {
+              this.errorMessage = error.error.message;
+            } else if (error?.message) {
+              this.errorMessage = error.message;
+            } else {
+              this.errorMessage =
+                'An error occurred during login. Please try again.';
+            }
+          },
+        });
+    } else {
+      this.errorMessage = 'Please fill in all required fields correctly.';
+    }
   }
 }

@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
     loadComponent: () =>
@@ -17,7 +16,7 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'home',
+    path: '',
     loadComponent: () =>
       import('./feature/home/home.component').then((m) => m.HomeComponent),
   },
@@ -27,7 +26,7 @@ export const routes: Routes = [
       import('./feature/chat/chat.component').then((m) => m.ChatComponent),
   },
   {
-    path: 'profile',
+    path: ':id',
     loadComponent: () =>
       import('./feature/profile/profile.component').then(
         (m) => m.ProfileComponent
