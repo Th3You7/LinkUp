@@ -14,7 +14,7 @@ import { ChatMainInputComponent } from '../chat-main-input/chat-main-input.compo
   styleUrl: './chat-main.component.css',
   encapsulation: ViewEncapsulation.None,
   host: {
-    class: 'flex-1 flex flex-col',
+    class: 'flex-2 flex flex-col',
   },
 })
 export class ChatMainComponent {}

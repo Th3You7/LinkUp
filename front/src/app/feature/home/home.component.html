@@ -1,6 +1,22 @@
-<div
-  class="flex min-h-screen items-start relative bg-[#f6f5f8] overflow-hidden"
->
-  <app-aside></app-aside>
-  <app-main></app-main>
+<!-- Navbar -->
+<app-navabr></app-navabr>
+
+<!-- Main Layout with top padding for navbar -->
+<div class="pt-16 min-h-screen bg-gray-50">
+  <div class="mx-auto px-4 sm:px-6 lg:px-0">
+    <div class="flex gap-8">
+      <!-- Aside Sidebar -->
+      <div class="hidden lg:block lg:w-120 flex-1">
+        <app-aside></app-aside>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-2 min-w-0 py-8">
+        <app-main></app-main>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="hidden lg:block lg:w-120 flex-1 py-8"></div>
+    </div>
+  </div>
 </div>

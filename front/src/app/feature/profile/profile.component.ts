@@ -3,6 +3,7 @@ import { ProfileMainComponent } from './components/profile-main/profile-main.com
 import { ProfileHeaderComponent } from './components/profile-header/profile-header.component';
 import { CommonModule } from '@angular/common';
 import { ProfileFriendsComponent } from './components/profile-friends/profile-friends.component';
+import { NavabrComponent } from '../../shared/components/navabr/navabr.component';
 
 @Component({
   selector: 'app-profile',
@@ -11,6 +12,7 @@ import { ProfileFriendsComponent } from './components/profile-friends/profile-fr
     ProfileMainComponent,
     CommonModule,
     ProfileFriendsComponent,
+    NavabrComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
