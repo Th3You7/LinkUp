@@ -70,6 +70,19 @@ public class FriendshipController {
         }
     }
     
+    // Cancel a friendship request (for sender)
+    @DeleteMapping("/{friendshipId}/cancel")
+    public ResponseEntity<Void> cancelFriendshipRequest(
+            @PathVariable UUID friendshipId,
+            @RequestParam UUID userId) {
+        try {
+            friendshipService.cancelFriendshipRequest(friendshipId, userId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    
     // ==================== FRIEND MANAGEMENT ====================
     
     // Remove a friend

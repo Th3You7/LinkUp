@@ -13,7 +13,10 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { FriendshipService } from '../../../../core/services/friendship.service';
 import { User } from '../../../../core/models/user.model';
-import { FriendshipStatus } from '../../../../core/models/friendship.model';
+import {
+  FriendshipStatus,
+  Friendship,
+} from '../../../../core/models/friendship.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -33,6 +36,7 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   profileUser: User | null = null;
   friendshipStatus: FriendshipStatus | null = null;
+  friendship: Friendship | null = null;
   isBlockDropdownOpen = false;
 
   ngOnInit(): void {
@@ -88,7 +92,7 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
   }
 
   isOwnProfile(): boolean {
-    return !this.profileUserId;
+    return this.profileUserId === this.currentUser?.id;
   }
 
   // Friendship management methods
@@ -99,6 +103,7 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
       .getFriendshipStatus(this.currentUser.id, this.profileUserId)
       .subscribe({
         next: (friendship) => {
+          this.friendship = friendship;
           this.friendshipStatus = friendship?.status || null;
         },
         error: (error) => {
@@ -117,6 +122,24 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
 
   isPending(): boolean {
     return this.friendshipStatus === FriendshipStatus.PENDING;
+  }
+
+  isPendingSender(): boolean {
+    return (
+      this.isPending() &&
+      !!this.friendship &&
+      !!this.currentUser &&
+      this.friendship.sender.id === this.currentUser.id
+    );
+  }
+
+  isPendingReceiver(): boolean {
+    return (
+      this.isPending() &&
+      !!this.friendship &&
+      !!this.currentUser &&
+      this.friendship.receiver.id === this.currentUser.id
+    );
   }
 
   addFriend() {
@@ -149,6 +172,56 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Failed to remove friend:', error);
+        },
+      });
+  }
+
+  cancelFriendRequest() {
+    if (!this.currentUser || !this.friendship) return;
+
+    this.friendshipService
+      .cancelFriendshipRequest(this.friendship.id, this.currentUser.id)
+      .subscribe({
+        next: () => {
+          this.friendshipStatus = null;
+          this.friendship = null;
+          console.log('Friend request cancelled');
+        },
+        error: (error) => {
+          console.error('Failed to cancel friend request:', error);
+        },
+      });
+  }
+
+  acceptFriendRequest() {
+    if (!this.currentUser || !this.friendship) return;
+
+    this.friendshipService
+      .acceptFriendshipRequest(this.friendship.id, this.currentUser.id)
+      .subscribe({
+        next: () => {
+          this.friendshipStatus = FriendshipStatus.ACCEPTED;
+          console.log('Friend request accepted');
+        },
+        error: (error) => {
+          console.error('Failed to accept friend request:', error);
+        },
+      });
+  }
+
+  rejectFriendRequest() {
+    if (!this.currentUser || !this.friendship) return;
+
+    this.friendshipService
+      .rejectFriendshipRequest(this.friendship.id, this.currentUser.id)
+      .subscribe({
+        next: () => {
+          this.friendshipStatus = null;
+          this.friendship = null;
+          console.log('Friend request rejected');
+        },
+        error: (error) => {
+          console.error('Failed to reject friend request:', error);
         },
       });
   }

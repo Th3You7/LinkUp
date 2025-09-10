@@ -12,6 +12,7 @@ export class AppConfig {
     SEND_REQUEST: `${AppConfig.API_BASE_URL}/friendships/send`,
     ACCEPT_REQUEST: `${AppConfig.API_BASE_URL}/friendships`,
     REJECT_REQUEST: `${AppConfig.API_BASE_URL}/friendships`,
+    CANCEL_REQUEST: `${AppConfig.API_BASE_URL}/friendships`,
     REMOVE_FRIEND: `${AppConfig.API_BASE_URL}/friendships/remove`,
     BLOCK_USER: `${AppConfig.API_BASE_URL}/friendships/block`,
     UNBLOCK_USER: `${AppConfig.API_BASE_URL}/friendships/unblock`,

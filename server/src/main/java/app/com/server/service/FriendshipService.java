@@ -113,6 +113,29 @@ public class FriendshipService {
         friendshipRepository.delete(friendship);
     }
     
+    // Cancel a friendship request (for sender)
+    public void cancelFriendshipRequest(UUID friendshipId, UUID userId) {
+        Optional<Friendship> friendshipOpt = friendshipRepository.findById(friendshipId);
+        if (friendshipOpt.isEmpty()) {
+            throw new IllegalArgumentException("Friendship request not found");
+        }
+        
+        Friendship friendship = friendshipOpt.get();
+        
+        // Check if user is the sender
+        if (!friendship.getSender().getId().equals(userId)) {
+            throw new IllegalArgumentException("You can only cancel friendship requests sent by you");
+        }
+        
+        // Check if status is pending
+        if (friendship.getStatus() != FriendshipInvitationStatus.PENDING) {
+            throw new IllegalArgumentException("You can only cancel pending friendship requests");
+        }
+        
+        // Delete the friendship request
+        friendshipRepository.delete(friendship);
+    }
+    
     // Block a user
     public FriendshipResponseDto blockUser(UUID userId, UUID userToBlockId) {
         // Check if users exist

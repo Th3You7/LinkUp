@@ -147,6 +147,38 @@ export class FriendshipService {
       );
   }
 
+  // Cancel friendship request
+  cancelFriendshipRequest(
+    friendshipId: string,
+    userId: string
+  ): Observable<void> {
+    this.setLoading(true);
+    const params = new HttpParams().set('userId', userId);
+    return this.http
+      .delete<void>(
+        `${AppConfig.FRIENDSHIP_ENDPOINTS.CANCEL_REQUEST}/${friendshipId}/cancel`,
+        { params }
+      )
+      .pipe(
+        tap(() => {
+          const currentState = this.state.value;
+          const updatedPending = currentState.pendingRequests.filter(
+            (f) => f.id !== friendshipId
+          );
+          this.updateState({
+            pendingRequests: updatedPending,
+            loading: false,
+            error: null,
+          });
+        }),
+        catchError((error) => {
+          this.setError('Failed to cancel friendship request');
+          return throwError(() => error);
+        }),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
   // Remove friend
   removeFriend(userId: string, friendId: string): Observable<void> {
     this.setLoading(true);

@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: 'login',
+    pathMatch: 'full',
     loadComponent: () =>
       import('./feature/auth/login/login.component').then(
         (m) => m.LoginComponent
@@ -10,6 +11,7 @@ export const routes: Routes = [
   },
   {
     path: 'register',
+    pathMatch: 'full',
     loadComponent: () =>
       import('./feature/auth/register/register.component').then(
         (m) => m.RegisterComponent
@@ -22,6 +24,7 @@ export const routes: Routes = [
   },
   {
     path: 'chat',
+    pathMatch: 'full',
     loadComponent: () =>
       import('./feature/chat/chat.component').then((m) => m.ChatComponent),
   },

@@ -99,7 +99,7 @@
       <div *ngIf="!isOwnProfile()" class="flex items-center gap-2">
         <!-- Add Friend / Unfriend Button -->
         <button
-          *ngIf="!isBlocked()"
+          *ngIf="!isBlocked() && !isPending()"
           (click)="isFriend() ? removeFriend() : addFriend()"
           [class]="
             isFriend()
@@ -137,6 +137,67 @@
           </svg>
           {{ isFriend() ? "Unfriend" : "Add Friend" }}
         </button>
+
+        <!-- Pending Sender Button (Cancel) -->
+        <div *ngIf="!isBlocked() && isPendingSender()" class="relative group">
+          <button
+            (click)="cancelFriendRequest()"
+            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-600 shadow-2xs hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 cursor-pointer"
+          >
+            Pending
+          </button>
+          <!-- Hover Tooltip -->
+          <div
+            class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10"
+          >
+            Cancel
+          </div>
+        </div>
+
+        <!-- Pending Receiver Buttons (Accept/Reject) -->
+        <div
+          *ngIf="!isBlocked() && isPendingReceiver()"
+          class="flex items-center gap-2"
+        >
+          <button
+            (click)="acceptFriendRequest()"
+            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-emerald-200 bg-emerald-500 text-white shadow-2xs hover:bg-emerald-600 focus:outline-hidden focus:bg-emerald-600 cursor-pointer"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              ></path>
+            </svg>
+            Accept
+          </button>
+          <button
+            (click)="rejectFriendRequest()"
+            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 cursor-pointer"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+            Reject
+          </button>
+        </div>
 
         <!-- Message Button -->
         <button
@@ -220,7 +281,11 @@
         class="hs-scroll-nav-body flex flex-nowrap gap-x-1 overflow-x-auto [&::-webkit-scrollbar]:h-0 snap-x snap-mandatory pb-1.5"
       >
         <a
-          class="snap-start relative inline-flex flex-nowrap items-center gap-x-2 px-2.5 py-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-sm whitespace-nowrap rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 after:absolute after:-bottom-0.5 after:inset-x-0 after:z-10 after:w-1/4 after:h-0.5 after:rounded-full after:mx-auto after:pointer-events-none"
+          [class]="
+            currentTab === 'my-profile'
+              ? 'snap-start relative inline-flex flex-nowrap items-center gap-x-2 px-2.5 py-1.5 bg-emerald-100 text-emerald-700 text-sm whitespace-nowrap rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden after:absolute after:-bottom-0.5 after:inset-x-0 after:z-10 after:w-1/4 after:h-0.5 after:bg-emerald-600 after:rounded-full after:mx-auto after:pointer-events-none cursor-pointer'
+              : 'snap-start relative inline-flex flex-nowrap items-center gap-x-2 px-2.5 py-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-sm whitespace-nowrap rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 after:absolute after:-bottom-0.5 after:inset-x-0 after:z-10 after:w-1/4 after:h-0.5 after:rounded-full after:mx-auto after:pointer-events-none cursor-pointer'
+          "
           (click)="currentTabChange.emit('my-profile')"
         >
           <svg
@@ -247,10 +312,14 @@
             <path d="m14.3 16.6 1-.4" />
             <path d="m20.7 13.8 1-.4" />
           </svg>
-          My Profile
+          Profile
         </a>
         <a
-          class="snap-start relative inline-flex flex-nowrap items-center gap-x-2 px-2.5 py-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-sm whitespace-nowrap rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 after:absolute after:-bottom-0.5 after:inset-x-0 after:z-10 after:w-1/4 after:h-0.5 after:rounded-full after:mx-auto after:pointer-events-none"
+          [class]="
+            currentTab === 'friends'
+              ? 'snap-start relative inline-flex flex-nowrap items-center gap-x-2 px-2.5 py-1.5 bg-emerald-100 text-emerald-700 text-sm whitespace-nowrap rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden after:absolute after:-bottom-0.5 after:inset-x-0 after:z-10 after:w-1/4 after:h-0.5 after:bg-emerald-600 after:rounded-full after:mx-auto after:pointer-events-none cursor-pointer'
+              : 'snap-start relative inline-flex flex-nowrap items-center gap-x-2 px-2.5 py-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-sm whitespace-nowrap rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 after:absolute after:-bottom-0.5 after:inset-x-0 after:z-10 after:w-1/4 after:h-0.5 after:rounded-full after:mx-auto after:pointer-events-none cursor-pointer'
+          "
           (click)="currentTabChange.emit('friends')"
         >
           <svg

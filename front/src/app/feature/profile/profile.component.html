@@ -6,6 +6,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <app-profile-header
       [profileUserId]="getProfileUserId()"
+      [currentTab]="getCurrentTab()"
       (currentTabChange)="setCurrentTab($event)"
     ></app-profile-header>
     <div class="mt-8">

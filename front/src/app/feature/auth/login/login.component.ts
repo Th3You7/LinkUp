@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
-  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
   FormsModule,
   Validators,
 } from '@angular/forms';
@@ -13,7 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -22,26 +23,28 @@ export class LoginComponent {
   authService: AuthService = inject(AuthService);
   router: Router = inject(Router);
 
-  username = new FormControl('', [Validators.required, Validators.email]);
-  password = new FormControl('', [
-    Validators.required,
-    Validators.minLength(6),
-  ]);
-
+  loginForm: FormGroup;
   showPassword = false;
   rememberMe = false;
   errorMessage = '';
+
+  constructor() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
   onLogin() {
-    if (this.username.valid && this.password.valid) {
+    if (this.loginForm.valid) {
       this.authService
         .login({
-          username: this.username.value,
-          password: this.password.value,
+          username: this.loginForm.value.email, // Send email as username
+          password: this.loginForm.value.password,
         } as LoginRequest)
         .subscribe({
           next: (response) => {
@@ -71,5 +74,14 @@ export class LoginComponent {
     } else {
       this.errorMessage = 'Please fill in all required fields correctly.';
     }
+  }
+
+  // Getter methods for easy access to form controls
+  get email() {
+    return this.loginForm.get('email');
+  }
+
+  get password() {
+    return this.loginForm.get('password');
   }
 }
