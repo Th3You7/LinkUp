@@ -157,4 +157,8 @@ public class UserService {
         }
         throw new IllegalArgumentException("Invalid email or password");
     }
+
+    public List<UserDto> getUsersByString(String string) {
+        return userRepository.findByFirstNameOrLastNameContainingIgnoreCaseAndUsernameContainingIgnoreCase(string).stream().map(userMapper::toDto).collect(Collectors.toList());
+    }
 } 

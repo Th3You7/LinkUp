@@ -36,4 +36,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     
     // Find user by email and password (for authentication)
     Optional<User> findByEmailAndPassword(String email, String password);
-} 
+    @Query("SELECT u FROM User u WHERE LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<User> findByFirstNameOrLastNameContainingIgnoreCaseAndUsernameContainingIgnoreCase(@Param("searchTerm") String searchTerm);
+}

@@ -1,0 +1,54 @@
+<div
+  class="flex flex-col p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+>
+  <div class="flex items-center gap-3 mb-3">
+    <!-- Avatar Container -->
+    <div class="relative flex-shrink-0">
+      <div
+        class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 border-2 border-gray-100"
+      >
+        <img
+          *ngIf="request.sender.avatar"
+          [src]="request.sender.avatar"
+          [alt]="getSenderName()"
+          class="w-full h-full object-cover"
+        />
+        <div
+          *ngIf="!request.sender.avatar"
+          class="w-full h-full flex items-center justify-center bg-emerald-500 text-white font-semibold text-sm"
+        >
+          {{ getSenderInitials() }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Friend Info -->
+    <div class="flex-1 min-w-0">
+      <div class="font-medium text-gray-900 text-sm truncate">
+        {{ getSenderName() }}
+      </div>
+      <div class="text-xs text-gray-500 truncate">
+        {{ getTimeAgo() }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex gap-2">
+    <button
+      (click)="acceptRequest()"
+      [disabled]="processing"
+      class="flex-1 px-3 py-2 text-sm bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      Accept
+    </button>
+
+    <button
+      (click)="rejectRequest()"
+      [disabled]="processing"
+      class="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      Reject
+    </button>
+  </div>
+</div>

@@ -1,0 +1,593 @@
+<header
+  class="fixed border-b border-gray-200 top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-48 md:z-61 bg-white py-2.5"
+>
+  <nav
+    class="px-4 sm:px-6 lg:px-8 flex flex-wrap basis-full justify-between items-center md:grid md:grid-cols-12 w-full mx-auto"
+  >
+    <div class="md:order-1 md:col-span-3 flex items-center sm:gap-x-1.5">
+      <a
+        class="shrink-0 text-xl inline-block font-semibold focus:outline-hidden focus:opacity-80"
+        routerLink="/"
+        aria-label="LinkUp"
+      >
+        <svg
+          class="shrink-0 size-7"
+          width="36"
+          height="36"
+          viewBox="0 0 36 36"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            clip-rule="evenodd"
+            d="M18.0835 3.23358C9.88316 3.23358 3.23548 9.8771 3.23548 18.0723V35.5832H0.583496V18.0723C0.583496 8.41337 8.41851 0.583252 18.0835 0.583252C27.7485 0.583252 35.5835 8.41337 35.5835 18.0723C35.5835 27.7312 27.7485 35.5614 18.0835 35.5614H16.7357V32.911H18.0835C26.2838 32.911 32.9315 26.2675 32.9315 18.0723C32.9315 9.8771 26.2838 3.23358 18.0835 3.23358Z"
+            class="fill-emerald-600"
+            fill="currentColor"
+          />
+          <path
+            fillRule="evenodd"
+            clip-rule="evenodd"
+            d="M18.0833 8.62162C12.8852 8.62162 8.62666 12.9245 8.62666 18.2879V35.5833H5.97468V18.2879C5.97468 11.5105 11.3713 5.97129 18.0833 5.97129C24.7954 5.97129 30.192 11.5105 30.192 18.2879C30.192 25.0653 24.7954 30.6045 18.0833 30.6045H16.7355V27.9542H18.0833C23.2815 27.9542 27.54 23.6513 27.54 18.2879C27.54 12.9245 23.2815 8.62162 18.0833 8.62162Z"
+            class="fill-emerald-600"
+            fill="currentColor"
+          />
+          <path
+            d="M24.8225 18.1012C24.8225 21.8208 21.8053 24.8361 18.0833 24.8361C14.3614 24.8361 11.3442 21.8208 11.3442 18.1012C11.3442 14.3815 14.3614 11.3662 18.0833 11.3662C21.8053 11.3662 24.8225 14.3815 24.8225 18.1012Z"
+            class="fill-emerald-600"
+            fill="currentColor"
+          />
+        </svg>
+      </a>
+
+      <!-- Search Bar -->
+      <div
+        class="hidden sm:block ms-4 flex-1 max-w-md search-container relative"
+      >
+        <div class="relative w-full">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (keyup.enter)="onSearch()"
+            class="py-1.5 ps-4 sm:py-2.5 pe-10 block w-full bg-white border border-gray-200 text-base sm:text-sm rounded-full focus:outline-hidden focus:border-emerald-600 focus:ring-emerald-600 disabled:opacity-50 disabled:pointer-events-none"
+            placeholder="Search people..."
+          />
+          <div
+            class="absolute inset-y-0 end-0 z-10 flex items-center pe-1 sm:pe-1.5"
+          >
+            <button
+              type="button"
+              (click)="onSearch()"
+              class="inline-flex shrink-0 justify-center items-center w-10 h-8 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-hidden focus:bg-emerald-700"
+            >
+              <svg
+                class="shrink-0 size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
+          </div>
+          <div
+            *ngIf="showClearButton"
+            class="absolute inset-y-0 end-12 flex items-center pointer-events-none z-10 pe-1"
+          >
+            <button
+              type="button"
+              (click)="clearSearch()"
+              class="inline-flex shrink-0 justify-center items-center size-6 rounded-full text-gray-500 hover:text-emerald-600 focus:outline-hidden focus:text-emerald-600 pointer-events-auto"
+              aria-label="Close"
+            >
+              <span class="sr-only">Close</span>
+              <svg
+                class="shrink-0 size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="m15 9-6 6" />
+                <path d="m9 9 6 6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Dropdown -->
+        <div
+          *ngIf="isSearchDropdownOpen"
+          class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-30 max-h-80 overflow-y-auto"
+        >
+          <div class="p-2">
+            <div
+              class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 py-2"
+            >
+              People
+            </div>
+
+            <!-- Loading State -->
+            <div *ngIf="isSearchLoading" class="px-3 py-4 text-center">
+              <div class="inline-flex items-center">
+                <svg
+                  class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Searching...
+              </div>
+            </div>
+
+            <!-- Search Results -->
+            <div
+              *ngIf="!isSearchLoading && searchResults.length > 0"
+              class="space-y-1"
+            >
+              <div
+                *ngFor="let user of searchResults"
+                (click)="selectUser(user)"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                <img
+                  [src]="
+                    user.avatar ||
+                    'https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80'
+                  "
+                  [alt]="user.firstName + ' ' + user.lastName"
+                  class="shrink-0 size-8 rounded-full"
+                />
+                <div class="grow min-w-0">
+                  <div class="text-sm font-medium text-gray-900 truncate">
+                    {{ user.firstName }} {{ user.lastName }}
+                  </div>
+                  <div class="text-sm text-gray-500 truncate">
+                    {{ user.email }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No Results -->
+            <div
+              *ngIf="
+                !isSearchLoading &&
+                searchResults.length === 0 &&
+                searchQuery.trim().length >= 2
+              "
+              class="px-3 py-4 text-center"
+            >
+              <div class="text-sm text-gray-500">
+                No people found for "{{ searchQuery }}"
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Button Group -->
+    <div
+      class="md:order-3 md:col-span-3 flex md:justify-end items-center gap-x-2"
+    >
+      <!-- Notifications Button -->
+      <div class="notification-container relative inline-block">
+        <button
+          type="button"
+          (click)="toggleNotificationDropdown()"
+          class="relative group flex flex-col justify-center items-center text-xs text-gray-600 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden cursor-pointer"
+        >
+          <span
+            class="flex justify-center items-center gap-x-3 size-9 rounded-full group-hover:bg-gray-200 group-focus:bg-gray-200 transition"
+          >
+            <svg
+              class="shrink-0 size-4"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+              <path
+                d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+              />
+            </svg>
+            <!-- Notification badge -->
+            <span
+              *ngIf="getUnreadNotificationsCount() > 0"
+              class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+            >
+              {{ getUnreadNotificationsCount() }}
+            </span>
+          </span>
+          <span class="sr-only">Notifications</span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <div
+          *ngIf="isNotificationDropdownOpen"
+          class="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-20"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
+              <span class="text-sm text-gray-500"
+                >{{ notifications.length }} total</span
+              >
+            </div>
+          </div>
+
+          <div class="max-h-80 overflow-y-auto">
+            <div
+              *ngIf="notifications.length === 0"
+              class="p-4 text-center text-gray-500"
+            >
+              No notifications
+            </div>
+
+            <div
+              *ngFor="let notification of notifications"
+              (click)="markAsRead(notification)"
+              class="flex items-start gap-x-3 p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+              [class.bg-blue-50]="!notification.read"
+            >
+              <img
+                [src]="notification.avatar"
+                [alt]="notification.message"
+                class="shrink-0 size-10 rounded-full"
+              />
+              <div class="grow min-w-0">
+                <div class="text-sm text-gray-900">
+                  {{ notification.message }}
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  {{ notification.time }}
+                </div>
+              </div>
+              <div *ngIf="!notification.read" class="shrink-0">
+                <div class="size-2 rounded-full bg-blue-500"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 border-t border-gray-200">
+            <button
+              class="w-full text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View all notifications
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Dropdown -->
+      <div class="dropdown-container relative inline-block">
+        <button
+          type="button"
+          (click)="toggleDropdown()"
+          class="group flex flex-col justify-center items-center text-xs text-gray-600 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden cursor-pointer"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="isDropdownOpen"
+          aria-label="Dropdown"
+        >
+          <span
+            class="relative flex justify-center items-center gap-x-3 size-9 rounded-full group-hover:bg-gray-200 group-focus:bg-gray-200 transition"
+          >
+            <img
+              class="shrink-0 size-8 rounded-full"
+              [src]="getUserAvatar()"
+              [alt]="getUserName()"
+            />
+            <span
+              class="absolute bottom-0.5 end-0.5 block size-2 rounded-full ring-2 ring-white bg-green-500 text-white"
+            ></span>
+          </span>
+          <span class="sr-only">{{ getUserName() }}</span>
+        </button>
+
+        <!-- Account Dropdown Menu -->
+        <div
+          *ngIf="isDropdownOpen"
+          class="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-xl shadow-xl z-20"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <div class="p-1">
+            <div
+              class="w-full flex items-center gap-x-2 py-2 px-3 text-start rounded-lg text-sm text-gray-800 hover:bg-gray-100"
+            >
+              <span class="shrink-0">
+                <img
+                  class="shrink-0 size-9 rounded-full"
+                  [src]="getUserAvatar()"
+                  [alt]="getUserName()"
+                />
+              </span>
+              <span class="grow truncate">
+                <span class="truncate font-medium text-gray-800">
+                  {{ getUserName() }}
+                </span>
+                <span class="block truncate text-sm text-gray-500">
+                  {{ getUserEmail() }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="p-1 border-t border-gray-200">
+            <!-- Theme Toggle -->
+            <div class="pt-1 mt-1 border-t border-gray-200">
+              <button
+                type="button"
+                (click)="toggleTheme()"
+                class="flex items-center gap-x-2 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 cursor-pointer w-full"
+              >
+                <svg
+                  *ngIf="!isDarkTheme"
+                  class="shrink-0 size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+                <svg
+                  *ngIf="isDarkTheme"
+                  class="shrink-0 size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <path
+                    d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                  />
+                </svg>
+                <span>{{ isDarkTheme ? "Light mode" : "Dark mode" }}</span>
+              </button>
+            </div>
+
+            <!-- Sign Out -->
+            <div class="pt-1 mt-1 border-t border-gray-200">
+              <a
+                class="flex items-center gap-x-2 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 cursor-pointer"
+                (click)="logout()"
+              >
+                Sign out
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="md:hidden">
+        <!-- Collapse Button Trigger -->
+        <button
+          type="button"
+          class="relative group flex flex-col justify-center items-center text-xs text-gray-600 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden"
+          id="hs-pro-dmh-collapse"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="hs-pro-dmh"
+          aria-label="Toggle navigation"
+        >
+          <span
+            class="flex justify-center items-center gap-x-3 size-9 rounded-full group-hover:bg-gray-200 group-focus:bg-gray-200 transition"
+          >
+            <svg
+              class="shrink-0 size-4"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="12" cy="5" r="1" />
+              <circle cx="12" cy="19" r="1" />
+            </svg>
+          </span>
+          <span class="sr-only">Menu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Nav Links -->
+    <div
+      class="md:order-2 md:col-span-6 basis-full grow md:basis-auto md:grow-0"
+    >
+      <!-- Collapse -->
+      <div
+        id="hs-pro-dmh"
+        class="hs-overlay [--auto-close:lg] [--overlay-backdrop:false] hs-overlay-open:translate-y-0 hs-overlay-open:translate-x-0 hs-overlay-open:scale-100 hs-overlay-open:opacity-100 -translate-y-1/2 translate-x-1/2 scale-25 opacity-0 transition-all duration-300 transform w-72 hidden fixed top-2 end-2 z-60 bg-white shadow-xl rounded-xl md:static md:block md:h-auto md:w-full md:translate-none md:transition-none md:transform-none md:scale-100 md:opacity-100 md:z-40 md:rounded-none md:shadow-none"
+        role="dialog"
+        tabindex="-1"
+        aria-label="Sidebar"
+      >
+        <div
+          class="overflow-hidden overflow-y-auto h-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300"
+        >
+          <!-- Header -->
+          <div
+            class="py-2 px-4 md:hidden flex justify-between items-center border-b border-gray-200"
+          >
+            <h3 class="font-medium text-gray-800">Menu</h3>
+            <button
+              type="button"
+              class="py-1.5 px-2 inline-flex justify-center items-center gap-x-1 rounded-full border border-gray-200 text-xs text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
+              aria-label="Close"
+            >
+              <span class="hidden lg:block">Esc</span>
+              <span class="block lg:hidden">Close</span>
+              <svg
+                class="shrink-0 size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="py-4 px-1.5 md:p-0 flex flex-col md:flex-row md:justify-center md:items-center gap-1 md:gap-x-7 pt-2 md:pt-0"
+          >
+            <a
+              class="relative group flex flex-row md:flex-col items-center gap-x-2 md:gap-x-0 text-sm md:text-xs disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden"
+              [class.text-emerald-600]="isActiveRoute('/')"
+              [class.text-gray-800]="!isActiveRoute('/')"
+              routerLink="/"
+            >
+              <span
+                class="flex justify-center items-center gap-x-3 size-9 rounded-full transition"
+                [class.bg-emerald-100]="isActiveRoute('/')"
+                [class.group-hover:bg-gray-200]="!isActiveRoute('/')"
+                [class.group-focus:bg-gray-200]="!isActiveRoute('/')"
+              >
+                <svg
+                  class="shrink-0 size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+              </span>
+              Home
+            </a>
+            <a
+              class="relative group flex flex-row md:flex-col items-center gap-x-2 md:gap-x-0 text-sm md:text-xs disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden"
+              [class.text-emerald-600]="isActiveRoute('/chat')"
+              [class.text-gray-800]="!isActiveRoute('/chat')"
+              routerLink="/chat"
+            >
+              <span
+                class="flex justify-center items-center gap-x-3 size-9 rounded-full transition"
+                [class.bg-emerald-100]="isActiveRoute('/chat')"
+                [class.group-hover:bg-gray-200]="!isActiveRoute('/chat')"
+                [class.group-focus:bg-gray-200]="!isActiveRoute('/chat')"
+              >
+                <svg
+                  class="shrink-0 size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  />
+                  <path d="M13 8H7" />
+                  <path d="M17 12H7" />
+                </svg>
+              </span>
+              Chat
+            </a>
+            <a
+              class="relative group flex flex-row md:flex-col items-center gap-x-2 md:gap-x-0 text-sm md:text-xs disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden"
+              [class.text-emerald-600]="isActiveRoute('/profile')"
+              [class.text-gray-800]="!isActiveRoute('/profile')"
+              [routerLink]="currentUser ? ['/', currentUser.id] : '/'"
+            >
+              <span
+                class="flex justify-center items-center gap-x-3 size-9 rounded-full transition"
+                [class.bg-emerald-100]="isActiveRoute('/profile')"
+                [class.group-hover:bg-gray-200]="!isActiveRoute('/profile')"
+                [class.group-focus:bg-gray-200]="!isActiveRoute('/profile')"
+              >
+                <svg
+                  class="shrink-0 size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+              Profile
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

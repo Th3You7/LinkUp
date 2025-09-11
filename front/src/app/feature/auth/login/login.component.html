@@ -4,7 +4,7 @@
     <div class="max-w-md w-full">
       <!-- Logo/Brand -->
       <div class="flex items-center mb-8">
-        <span class="text-blue-600 text-2xl font-bold">LinkUp</span>
+        <span class="text-emerald-600 text-2xl font-bold">LinkUp</span>
       </div>
 
       <!-- Main Heading -->
@@ -66,167 +66,174 @@
         {{ errorMessage }}
       </div>
 
-      <!-- Email Input -->
-      <div class="mb-6">
-        <div class="relative">
-          <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-          >
-            <svg
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      <form [formGroup]="loginForm">
+        <!-- Email Input -->
+        <div class="mb-6">
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              ></path>
-            </svg>
+              <svg
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                ></path>
+              </svg>
+            </div>
+            <input
+              type="email"
+              formControlName="email"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="Email"
+            />
           </div>
-          <input
-            type="email"
-            [(ngModel)]="loginForm.value.username"
-            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Email"
-          />
         </div>
-      </div>
-      <div
-        *ngIf="
-          loginForm.get('username')?.invalid &&
-          loginForm.get('username')?.touched
-        "
-        class="text-red-500 text-sm mt-1"
-      >
-        Username is required
-      </div>
-
-      <!-- Password Input -->
-      <div class="mb-6">
-        <div class="relative">
-          <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+        <div
+          *ngIf="email?.invalid && email?.touched"
+          class="text-red-500 text-sm mt-0.5 mb-1"
+        >
+          <span *ngIf="email?.errors?.['required']">Email is required</span>
+          <span *ngIf="email?.errors?.['email']"
+            >Please enter a valid email address</span
           >
-            <svg
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        </div>
+
+        <!-- Password Input -->
+        <div class="mb-6">
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              ></path>
-            </svg>
+              <svg
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                ></path>
+              </svg>
+            </div>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="Password"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <svg
+                *ngIf="!showPassword"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                ></path>
+              </svg>
+              <svg
+                *ngIf="showPassword"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                ></path>
+              </svg>
+            </button>
           </div>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            [(ngModel)]="loginForm.value.password"
-            class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Password"
-          />
-          <button
-            type="button"
-            (click)="togglePasswordVisibility()"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center"
+        </div>
+        <div
+          *ngIf="password?.invalid && password?.touched"
+          class="text-red-500 text-sm mt-0.5 mb-1"
+        >
+          <span *ngIf="password?.errors?.['required']"
+            >Password is required</span
           >
-            <svg
-              *ngIf="!showPassword"
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              ></path>
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              ></path>
-            </svg>
-            <svg
-              *ngIf="showPassword"
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-              ></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div
-        *ngIf="
-          loginForm.get('password')?.invalid &&
-          loginForm.get('password')?.touched
-        "
-        class="text-red-500 text-sm mt-1"
-      >
-        Password is required
-      </div>
-
-      <!-- Remember Me & Forgot Password -->
-      <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center">
-          <input
-            id="remember-me"
-            type="checkbox"
-            [(ngModel)]="rememberMe"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            checked
-          />
-          <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-            Remember me
-          </label>
-        </div>
-        <div class="text-sm">
-          <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
-            Forgot Password?
-          </a>
-        </div>
-      </div>
-
-      <!-- Login Button -->
-      <button
-        type="submit"
-        (click)="onLogin()"
-        class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
-      >
-        Log In
-      </button>
-
-      <!-- Sign Up Link -->
-      <div class="text-center mt-8">
-        <p class="text-sm text-gray-600">
-          Don't have an account?
-          <a
-            routerLink="/register"
-            class="font-medium text-blue-600 hover:text-blue-500"
+          <span *ngIf="password?.errors?.['minlength']"
+            >Password must be at least 6 characters long</span
           >
-            Create an account
-          </a>
-        </p>
-      </div>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center">
+            <input
+              id="remember-me"
+              type="checkbox"
+              [(ngModel)]="rememberMe"
+              class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+              checked
+            />
+            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+              Remember me
+            </label>
+          </div>
+          <div class="text-sm">
+            <a
+              href="#"
+              class="font-medium text-emerald-600 hover:text-emerald-500"
+            >
+              Forgot Password?
+            </a>
+          </div>
+        </div>
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          (click)="onLogin()"
+          class="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition duration-200"
+        >
+          Log In
+        </button>
+
+        <!-- Sign Up Link -->
+        <div class="text-center mt-8">
+          <p class="text-sm text-gray-600">
+            Don't have an account?
+            <a
+              routerLink="/register"
+              class="font-medium text-emerald-600 hover:text-emerald-500"
+            >
+              Create an account
+            </a>
+          </p>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Right Panel - Full Screen Blue Background -->
-  <div class="hidden lg:block lg:w-1/2 bg-blue-600"></div>
+  <!-- Right Panel - Full Screen Green Background -->
+  <div class="hidden lg:block lg:w-1/2 bg-emerald-600"></div>
 </div>

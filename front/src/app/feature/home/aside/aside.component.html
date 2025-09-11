@@ -1,33 +1,18 @@
-<section class="aside-container">
-  <div class="flex flex-col w-full items-start gap-8">
-    <header class="header-section">
-      <img class="logo" alt="Sourcetree" src="/sourcetree.png" />
+<!-- Aside Sidebar -->
+<div class="w-full h-full">
+  <div class="h-full flex flex-col">
+    <!-- Header -->
+    <div class="pt-6 pb-2 px-5 flex justify-between items-center gap-x-2">
+      <span class="block truncate font-semibold text-gray-800 text-lg">
+        Friends
+      </span>
+    </div>
 
-      <div class="search-container">
-        <div class="search-input">
-          <!-- Search Icon -->
-          <svg
-            class="search-icon"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            ></path>
-          </svg>
-          <span class="search-text"> Search </span>
-        </div>
-      </div>
-    </header>
-
-    <div class="friends-section">
-      <h2 class="friends-title">Friends</h2>
-
-      <div class="friends-list">
+    <!-- Friends List with Custom Scrollbar -->
+    <div
+      class="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300"
+    >
+      <div class="p-4 space-y-3">
         <app-friend-item
           *ngFor="let friend of friendsData; trackBy: trackByFriendId"
           [friend]="friend"
@@ -35,4 +20,4 @@
       </div>
     </div>
   </div>
-</section>
+</div>

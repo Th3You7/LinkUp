@@ -21,6 +21,8 @@ import { CreatePostData } from '../../../core/models/post.model';
   encapsulation: ViewEncapsulation.None,
 })
 export class CreatePostComponent implements OnDestroy {
+  @Output() postCreated = new EventEmitter<void>();
+
   postService = inject(PostService);
   authService = inject(AuthService);
 
@@ -140,6 +142,7 @@ export class CreatePostComponent implements OnDestroy {
       this.postService.createPost(postData).subscribe((post) => {
         console.log(post);
         this.resetForm();
+        this.postCreated.emit(); // Emit event when post is created
       });
       this.closeModal();
     }

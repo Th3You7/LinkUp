@@ -9,12 +9,14 @@ import { Post } from '../../../core/models/post.model';
 
 interface NavigationItem {
   icon: string;
+  name: string;
   isActive: boolean;
 }
 
 interface AvatarUser {
   src: string;
   alt: string;
+  name: string;
 }
 
 @Component({
@@ -67,19 +69,19 @@ export class MainComponent {
   }
 
   navigationItems: NavigationItem[] = [
-    { icon: 'home', isActive: true },
-    { icon: 'user', isActive: false },
-    { icon: 'message-circle', isActive: false },
-    { icon: 'bot', isActive: false },
-    { icon: 'settings', isActive: false },
+    { icon: 'home', name: 'Home', isActive: true },
+    { icon: 'user', name: 'Profile', isActive: false },
+    { icon: 'message-circle', name: 'Chat', isActive: false },
+    { icon: 'bot', name: 'AI', isActive: false },
+    { icon: 'settings', name: 'Settings', isActive: false },
   ];
 
   avatarUsers: AvatarUser[] = [
-    { src: '/male-avatar-16.png', alt: 'Male avatar' },
-    { src: '/male-avatar-16.png', alt: 'Male avatar' },
-    { src: '/male-avatar-16.png', alt: 'Male avatar' },
-    { src: '/male-avatar-16.png', alt: 'Male avatar' },
-    { src: '/male-avatar-16.png', alt: 'Male avatar' },
+    { src: '/male-avatar-16.png', alt: 'Male avatar', name: 'You' },
+    { src: '/male-avatar-16.png', alt: 'Male avatar', name: 'John' },
+    { src: '/male-avatar-16.png', alt: 'Male avatar', name: 'Sarah' },
+    { src: '/male-avatar-16.png', alt: 'Male avatar', name: 'Mike' },
+    { src: '/male-avatar-16.png', alt: 'Male avatar', name: 'Emma' },
   ];
 
   getIconClass(iconName: string): string {
@@ -99,5 +101,19 @@ export class MainComponent {
     this.navigationItems.forEach((item, i) => {
       item.isActive = i === index;
     });
+  }
+
+  getStoryBackgroundColor(index: number): string {
+    const colors = [
+      'bg-gradient-to-br from-gray-400 to-gray-500',
+      'bg-gradient-to-br from-gray-500 to-gray-600',
+      'bg-gradient-to-br from-gray-300 to-gray-400',
+      'bg-gradient-to-br from-gray-600 to-gray-700',
+      'bg-gradient-to-br from-gray-200 to-gray-300',
+      'bg-gradient-to-br from-gray-700 to-gray-800',
+      'bg-gradient-to-br from-gray-400 to-gray-600',
+      'bg-gradient-to-br from-gray-500 to-gray-700',
+    ];
+    return colors[index % colors.length];
   }
 }
