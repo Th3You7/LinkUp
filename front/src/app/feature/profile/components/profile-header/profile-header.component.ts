@@ -18,10 +18,11 @@ import {
   Friendship,
 } from '../../../../core/models/friendship.model';
 import { Router } from '@angular/router';
+import { MessageModalComponent } from '../../../../shared/components/message-modal/message-modal.component';
 
 @Component({
   selector: 'app-profile-header',
-  imports: [CommonModule],
+  imports: [CommonModule, MessageModalComponent],
   templateUrl: './profile-header.component.html',
   styleUrl: './profile-header.component.css',
 })
@@ -38,6 +39,9 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
   friendshipStatus: FriendshipStatus | null = null;
   friendship: Friendship | null = null;
   isBlockDropdownOpen = false;
+
+  // Message modal state
+  isMessageModalOpen: boolean = false;
 
   ngOnInit(): void {
     // Always load current user first
@@ -259,10 +263,12 @@ export class ProfileHeaderComponent implements OnInit, OnDestroy {
   }
 
   startChat() {
-    if (!this.profileUserId) return;
-    this.router.navigate(['/chat'], {
-      queryParams: { userId: this.profileUserId },
-    });
+    if (!this.profileUserId || !this.profileUser) return;
+    this.isMessageModalOpen = true;
+  }
+
+  closeMessageModal(): void {
+    this.isMessageModalOpen = false;
   }
 
   toggleBlockDropdown() {

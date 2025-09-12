@@ -7,14 +7,27 @@
         <span
           class="py-0.5 px-1.5 bg-gray-100 text-xs text-gray-500 rounded-full"
         >
-          Today
+          {{
+            currentSessionId
+              ? "Chat Messages"
+              : "Select a chat to start messaging"
+          }}
         </span>
       </div>
 
-      <div class="w-full space-y-5">
-        <app-chat-bubble></app-chat-bubble>
-        <app-chat-bubble></app-chat-bubble>
-        <app-chat-bubble></app-chat-bubble>
+      <div
+        class="w-full space-y-5 flex flex-col-reverse"
+        *ngIf="messages.length > 0"
+      >
+        <app-chat-bubble *ngFor="let message of messages" [message]="message">
+        </app-chat-bubble>
+      </div>
+
+      <div
+        class="w-full text-center text-gray-500 py-8"
+        *ngIf="messages.length === 0 && currentSessionId"
+      >
+        No messages yet. Start the conversation!
       </div>
     </div>
   </div>

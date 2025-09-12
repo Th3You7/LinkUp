@@ -4,10 +4,11 @@ import { Observable, BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { Friendship } from '../../../../core/models/friendship.model';
 import { FriendshipService } from '../../../../core/services/friendship.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { MessageModalComponent } from '../../../../shared/components/message-modal/message-modal.component';
 
 @Component({
   selector: 'app-profile-friends',
-  imports: [CommonModule],
+  imports: [CommonModule, MessageModalComponent],
   templateUrl: './profile-friends.component.html',
   styleUrl: './profile-friends.component.css',
 })
@@ -25,6 +26,14 @@ export class ProfileFriendsComponent implements OnInit, OnDestroy {
   friends$: Observable<Friendship[]> = this.localFriendsSubject.asObservable();
   loading$: Observable<boolean> = this.localLoadingSubject.asObservable();
   error$: Observable<string | null> = this.localErrorSubject.asObservable();
+
+  // Message modal state
+  isMessageModalOpen: boolean = false;
+  selectedFriend: {
+    id: string;
+    name: string;
+    username: string;
+  } | null = null;
 
   ngOnInit() {
     if (this.profileUserId) {
@@ -116,5 +125,28 @@ export class ProfileFriendsComponent implements OnInit, OnDestroy {
     return currentUser.id === friendship.sender.id
       ? friendship.receiver.avatar
       : friendship.sender.avatar;
+  }
+
+  openMessageModal(friendship: Friendship): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) return;
+
+    const friendId =
+      currentUser.id === friendship.sender.id
+        ? friendship.receiver.id
+        : friendship.sender.id;
+
+    this.selectedFriend = {
+      id: friendId,
+      name: this.getFriendName(friendship),
+      username: this.getFriendUsername(friendship),
+    };
+
+    this.isMessageModalOpen = true;
+  }
+
+  closeMessageModal(): void {
+    this.isMessageModalOpen = false;
+    this.selectedFriend = null;
   }
 }

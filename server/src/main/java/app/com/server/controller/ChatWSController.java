@@ -1,26 +1,77 @@
 package app.com.server.controller;
 
-import app.com.server.model.Message;
-import app.com.server.service.ChatService;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import app.com.server.dto.ChatSessionDto;
+import app.com.server.dto.MarkReadRequest;
+import app.com.server.dto.MessageDto;
+import app.com.server.dto.SendMessageRequest;
+import app.com.server.mapper.ChatMapper;
+import app.com.server.model.ChatParticipant;
+import app.com.server.model.ChatSession;
+import app.com.server.service.ChatService;
 
 @Controller
 public class ChatWSController {
     private final ChatService chatService;
     private final SimpMessagingTemplate broker;
+    private final ChatMapper chatMapper;
 
     @Autowired
-    public ChatWSController(ChatService chatService, SimpMessagingTemplate broker) {
+    public ChatWSController(ChatService chatService, SimpMessagingTemplate broker, ChatMapper chatMapper) {
         this.chatService = chatService;
         this.broker = broker;
+        this.chatMapper = chatMapper;
     }
 
     @MessageMapping("/chat.send")
-    public void send(Message message, String sessionId) {
-        chatService.sendMessage(message, sessionId);
+    public void send(@Payload SendMessageRequest request, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            // Check if chat session exists, if not create one
+            ChatSessionDto chatSession;
+            if (request.getChatSessionId() == null || request.getChatSessionId().isEmpty()) {
+                // No chat session specified, create a new one
+                chatSession = chatService.createChatSessionForMessage(request);
+                request.setChatSessionId(chatSession.getId().toString());
+            } else {
+                try {
+                    ChatSession entity = chatService.getChatSessionById(UUID.fromString(request.getChatSessionId()));
+                    chatSession = chatMapper.mapToChatSessionDto(entity);
+                } catch (IllegalArgumentException e) {
+                    // Chat session doesn't exist, create a new one
+                    chatSession = chatService.createChatSessionForMessage(request);
+                    request.setChatSessionId(chatSession.getId().toString());
+                }
+            }
+            
+            // Save the message to database
+            MessageDto message = chatService.sendMessage(request);
+            
+            // Send to all participants in the chat session
+            List<ChatParticipant> participants = chatService.getChatParticipants(request.getChatSessionId());
+            for (ChatParticipant participant : participants) {
+                // Send updated chat sessions list to each user
+                broker.convertAndSend("/topic/sessions/" + participant.getUser().getId().toString(), 
+                    chatService.getUserChatSessions(participant.getUser().getId()));
+                
+                // Send message to session-specific topic
+                broker.convertAndSend("/topic/sessions/" + request.getChatSessionId() + "/messages", 
+                    chatService.getMessages(request.getChatSessionId(), 0).getContent());
+            }
+        } catch (Exception e) {
+            System.err.println("Error sending message: " + e.getMessage());
+        }
     }
     @MessageMapping("/chat.list")
     public void join(String chatSessionId, int page) {
@@ -28,8 +79,19 @@ public class ChatWSController {
     }
 
     @MessageMapping("/chat.read")
-    public void read(Message message) {
-        chatService.markRead(message.getChatSession().getId().toString(), message.getSender());
+    public void read(@Payload MarkReadRequest request, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            chatService.markRead(request.getChatSessionId(), request.getUserId());
+            
+            // Notify participants about read status update
+            List<ChatParticipant> participants = chatService.getChatParticipants(request.getChatSessionId());
+            for (ChatParticipant participant : participants) {
+                broker.convertAndSend("/topic/sessions/" + participant.getUser().getId().toString(), 
+                    chatService.getUserChatSessions(participant.getUser().getId()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error marking as read: " + e.getMessage());
+        }
     }
 
     @MessageMapping("/chat.delete_message")
@@ -39,11 +101,69 @@ public class ChatWSController {
 
     @MessageMapping("/chat.delete_session")
     public void deleteSession(String sessionId) {
-        chatService.deleteSession(sessionId);
+        try {
+            // Get participants before deleting
+            List<ChatParticipant> participants = chatService.getChatParticipants(sessionId);
+            
+            // Delete the session
+            chatService.deleteSession(sessionId);
+            
+            // Notify participants about session deletion
+            for (ChatParticipant participant : participants) {
+                broker.convertAndSend("/topic/sessions/" + participant.getUser().getId().toString(), 
+                    chatService.getUserChatSessions(participant.getUser().getId()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting session: " + e.getMessage());
+        }
     }
 
     @MessageMapping("/chat.typing")
     public void typing(String sessionId) {
-        broker.convertAndSend("/topic/typing/" + sessionId, true);
+        broker.convertAndSend("/topic/sessions/" + sessionId + "/typing", true);
+    }
+
+
+    @MessageMapping("/chat.load_messages")
+    public void loadMessages(@Payload String requestBody, SimpMessageHeaderAccessor headerAccessor) {
+
+        try {
+            // Parse the request body to get chatSessionId and page
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> request = mapper.readValue(requestBody, Map.class);
+            String chatSessionId = (String) request.get("chatSessionId");
+            int page = request.get("page") != null ? ((Number) request.get("page")).intValue() : 0;
+            
+            System.out.println("Loading messages for session: " + chatSessionId + ", page: " + page);
+            
+            // Get messages from the service
+            Page<MessageDto> messages = chatService.getMessages(chatSessionId, page);
+            
+            System.out.println("Returning " + messages.getContent().size() + " messages");
+            
+            // Send messages to the specific session topic
+            broker.convertAndSend("/topic/sessions/" + chatSessionId + "/messages", messages.getContent());
+            
+        } catch (Exception e) {
+            System.err.println("Error loading messages: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Load user's chat sessions via WebSocket
+     * Best practice: Use @SendToUser for user-specific data
+     */
+    @MessageMapping("/chat.load_sessions")
+    public void loadUserSessions(@Payload String userId, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            System.out.println("Loading sessions for user: " + userId);
+            List<ChatSessionDto> sessions = chatService.getUserChatSessions(UUID.fromString(userId));
+
+            System.out.println("Returning " + sessions.size() + " sessions");
+            broker.convertAndSend("/topic/sessions/" + userId, sessions);
+        } catch (Exception e) {
+            System.err.println("Error loading sessions for user " + userId + ": " + e.getMessage());
+        }
     }
 }

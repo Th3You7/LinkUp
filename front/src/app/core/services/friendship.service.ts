@@ -17,12 +17,14 @@ import {
   throwError,
 } from 'rxjs';
 import { AppConfig } from '../config/app.config';
+import { ChatService } from './chat.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FriendshipService {
   private http = inject(HttpClient);
+  private chatService = inject(ChatService);
   private state = new BehaviorSubject<FriendshipState>({
     friendships: [],
     friends: [],
@@ -474,5 +476,15 @@ export class FriendshipService {
       loading: false,
       error: null,
     });
+  }
+
+  /**
+   * Start a chat session with a friend
+   */
+  startChatWithFriend(
+    friendId: string,
+    currentUserId: string
+  ): Observable<any> {
+    return this.chatService.createChatSession(currentUserId, friendId);
   }
 }

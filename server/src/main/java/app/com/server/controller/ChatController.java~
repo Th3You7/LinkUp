@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import app.com.server.dto.ChatSessionDto;
-import app.com.server.dto.MessageDto;
-import app.com.server.dto.SendMessageRequest;
+import app.com.server.model.ChatSession;
+import app.com.server.model.Message;
 import app.com.server.service.ChatService;
 
 @Controller
@@ -38,13 +37,13 @@ public class ChatController {
     }
 
     @GetMapping("/{chatId}/messages")
-    public Page<MessageDto> getMessages(@PathVariable String chatId, @RequestParam(defaultValue = "0") int page) {
+    public Page<Message> getMessages(@PathVariable String chatId, @RequestParam(defaultValue = "0") int page) {
         return chatService.getMessages(chatId, page);
     } // http://localhost:8080/api/chat/{chatId}/messages")
 
     @PostMapping("/{chatId}/messages")
-    public MessageDto sendMessage(@PathVariable String chatId, @RequestBody SendMessageRequest message) {
-        return chatService.sendMessage(message);
+    public Message sendMessage(@PathVariable String chatId, @RequestBody Message message) {
+        return chatService.sendMessage(message, chatId);
     }
 
     @DeleteMapping("/{chatId}/messages/{messageId}")
@@ -68,12 +67,12 @@ public class ChatController {
     }
 
     @PostMapping("/create-session")
-    public ChatSessionDto createChatSession(@RequestParam UUID userId1, @RequestParam UUID userId2) {
+    public ChatSession createChatSession(@RequestParam UUID userId1, @RequestParam UUID userId2) {
         return chatService.createChatSession(userId1, userId2);
     }
 
     @GetMapping("/user/{userId}/sessions")
-    public List<ChatSessionDto> getUserChatSessions(@PathVariable UUID userId) {
+    public List<ChatSession> getUserChatSessions(@PathVariable UUID userId) {
         return chatService.getUserChatSessions(userId);
     }
 

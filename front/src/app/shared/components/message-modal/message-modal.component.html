@@ -1,0 +1,118 @@
+<!-- Modal Backdrop -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+  (click)="onClose()"
+>
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-900">
+        Send Message to {{ friendName }}
+      </h3>
+      <button
+        type="button"
+        class="text-gray-400 hover:text-gray-600 focus:outline-none"
+        (click)="onClose()"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Friend Info -->
+    <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+      <div
+        class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium"
+      >
+        {{ friendName.charAt(0).toUpperCase() }}
+      </div>
+      <div>
+        <p class="font-medium text-gray-900">{{ friendName }}</p>
+        <p class="text-sm text-gray-500">&#64;{{ friendUsername }}</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div
+      *ngIf="error"
+      class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg"
+    >
+      <p class="text-sm text-red-600">{{ error }}</p>
+    </div>
+
+    <!-- Message Input -->
+    <div class="mb-4">
+      <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+        Your Message
+      </label>
+      <textarea
+        id="message"
+        [(ngModel)]="messageText"
+        (keypress)="onKeyPress($event)"
+        placeholder="Type your message here..."
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+        rows="4"
+        [disabled]="isLoading"
+      ></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end space-x-3">
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+        (click)="onClose()"
+        [disabled]="isLoading"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="onSendMessage()"
+        [disabled]="!messageText.trim() || isLoading"
+      >
+        <span *ngIf="isLoading" class="flex items-center">
+          <svg
+            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Sending...
+        </span>
+        <span *ngIf="!isLoading">Send Message</span>
+      </button>
+    </div>
+  </div>
+</div>

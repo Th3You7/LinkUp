@@ -346,4 +346,13 @@
     <!-- End Nav -->
   </div>
   <!-- End Header -->
+
+  <!-- Message Modal -->
+  <app-message-modal
+    [isOpen]="isMessageModalOpen"
+    [friendId]="profileUserId || null"
+    [friendName]="getFullName()"
+    [friendUsername]="getUsername()"
+    (closeModal)="closeMessageModal()"
+  ></app-message-modal>
 </div>
