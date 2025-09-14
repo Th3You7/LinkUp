@@ -56,7 +56,7 @@ public class ChatMapper {
             dto.setAttachmentType("");
             dto.setAttachmentName("");
             dto.setTimestamp(chatSession.getLastMessage() != null ? 
-                chatSession.getLastMessage().getCreatedAt().toString() : "");
+                chatSession.getLastMessage()getCreatedAt().toString() : "");
         } else {
             // Fallback values
             dto.setFirstName("User");

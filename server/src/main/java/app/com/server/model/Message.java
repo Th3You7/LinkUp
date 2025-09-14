@@ -35,4 +35,8 @@ public class Message {
     @JoinColumn(name = "chat_session_id")
     @JsonBackReference
     private ChatSession chatSession;
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }
