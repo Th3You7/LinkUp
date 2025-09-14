@@ -1,5 +1,6 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, map } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import {
   Client,
   Message as StompMessage,
@@ -15,19 +16,24 @@ import {
   MarkReadRequest,
 } from '../models/chat.model';
 import { AppConfig } from '../config/app.config';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService implements OnDestroy {
+  private currentUserId: string | null = null;
+  private authService = inject(AuthService);
+  private http = inject(HttpClient);
   private stompClient: Client | null = null;
-  private subscriptions: Map<string, StompSubscription> = new Map();
+  private currentSessionSubscription: StompSubscription | null = null;
   private isConnected = false;
 
   // State management
   private chatState = new BehaviorSubject<ChatState>({
     messages: [],
     chatSessions: [],
+    currentSessionId: null,
     loading: false,
     error: null,
     typingUsers: [],
@@ -42,11 +48,12 @@ export class ChatService implements OnDestroy {
   public loading$ = this.chatState$.pipe(map((state) => state.loading));
   public error$ = this.chatState$.pipe(map((state) => state.error));
   public typingUsers$ = this.chatState$.pipe(map((state) => state.typingUsers));
-
-  // Connection status
-  public connectionStatus$ = new BehaviorSubject<boolean>(false);
+  public currentSessionId$ = this.chatState$.pipe(
+    map((state) => state.currentSessionId)
+  );
 
   constructor() {
+    this.currentUserId = this.authService.getCurrentUser()?.id || null;
     this.initializeWebSocketConnection();
   }
 
@@ -55,8 +62,7 @@ export class ChatService implements OnDestroy {
    */
   private initializeWebSocketConnection(): void {
     this.stompClient = new Client({
-      webSocketFactory: () =>
-        new SockJS(`${AppConfig.API_BASE_URL.replace('/api', '')}/ws`),
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       debug: (str) => {
         console.log('STOMP Debug:', str);
       },
@@ -68,7 +74,10 @@ export class ChatService implements OnDestroy {
     this.stompClient.onConnect = (frame) => {
       console.log('Connected to WebSocket:', frame);
       this.isConnected = true;
-      this.connectionStatus$.next(true);
+      console.log(this.currentUserId);
+      if (this.currentUserId) {
+        this.subscribeToChatSessions(this.currentUserId);
+      }
       this.chatState.next({
         ...this.chatState.value,
         error: null,
@@ -78,8 +87,8 @@ export class ChatService implements OnDestroy {
     this.stompClient.onDisconnect = (frame) => {
       console.log('Disconnected from WebSocket:', frame);
       this.isConnected = false;
-      this.connectionStatus$.next(false);
-      this.subscriptions.clear();
+      this.currentSessionSubscription?.unsubscribe();
+      this.currentSessionSubscription = null;
     };
 
     this.stompClient.onStompError = (frame) => {
@@ -93,48 +102,121 @@ export class ChatService implements OnDestroy {
     this.stompClient.activate();
   }
 
-  /**
-   * Subscribe to messages for a specific user
-   */
-  public subscribeToMessages(userId: string): void {
+  public subscribeToChatSessions(currentUserId: string): void {
+    console.log('Subscribing to chat sessions for user:', currentUserId);
     if (!this.isConnected || !this.stompClient) {
       console.error('WebSocket not connected');
       return;
     }
 
-    const subscription = this.stompClient.subscribe(
-      `/topic/messages/${userId}`,
+    // Best Practice 1: Load initial data via WebSocket
+
+    // Best Practice 2: Subscribe to real-time updates
+    this.stompClient.subscribe(
+      `/topic/sessions/${currentUserId}`,
       (message: StompMessage) => {
-        const receivedMessage: Message = JSON.parse(message.body);
-        this.addMessage(receivedMessage);
+        const receivedChatSessions: ChatSession[] = JSON.parse(message.body);
+        console.log('Real-time update:', receivedChatSessions);
+        this.updateChatSessions(receivedChatSessions);
       }
     );
 
-    this.subscriptions.set(`messages_${userId}`, subscription);
+    // Best Practice 3: Subscribe to user-specific queue for initial data
+    this.stompClient.subscribe(
+      `/user/queue/sessions`,
+      (message: StompMessage) => {
+        const receivedChatSessions: ChatSession[] = JSON.parse(message.body);
+        console.log('Initial load:', receivedChatSessions);
+        this.updateChatSessions(receivedChatSessions);
+      }
+    );
+
+    this.loadInitialChatSessions(currentUserId);
   }
 
   /**
-   * Subscribe to typing indicators for a chat session
+   * Load initial chat sessions via WebSocket
+   * Best Practice: Use WebSocket for all real-time communication
    */
-  public subscribeToTyping(chatSessionId: string): void {
+  private loadInitialChatSessions(userId: string): void {
+    if (!this.isConnected || !this.stompClient) {
+      console.error('WebSocket not connected for initial load');
+      return;
+    }
+
+    console.log('Requesting initial chat sessions for user:', userId);
+    this.stompClient.publish({
+      destination: '/app/chat.load_sessions',
+      body: userId,
+    });
+  }
+
+  /**
+   * Update chat sessions in state
+   * Best Practice: Centralized state update logic
+   */
+  private updateChatSessions(chatSessions: ChatSession[]): void {
+    const currentState = this.chatState.value;
+    const newCurrentSessionId =
+      chatSessions.length > 0 ? chatSessions[0].id : null;
+
+    this.chatState.next({
+      ...currentState,
+      chatSessions: chatSessions,
+      currentSessionId: newCurrentSessionId,
+    });
+
+    this.stompClient?.subscribe(
+      `/topic/sessions/${newCurrentSessionId}/messages`,
+      (message: StompMessage) => {
+        const receivedMessages: Message[] = JSON.parse(message.body);
+        this.chatState.next({
+          ...this.chatState.value,
+          messages: receivedMessages,
+        });
+      }
+    );
+
+    // If we have a new current session and it's different from the previous one,
+    // load initial messages and subscribe to updates
+    if (
+      newCurrentSessionId &&
+      newCurrentSessionId !== currentState.currentSessionId
+    ) {
+      this.subscribeToCurrentSessionMessages(newCurrentSessionId);
+      this.loadInitialMessages(newCurrentSessionId);
+    }
+  }
+
+  public subscribeToCurrentSessionMessages(currentSessionId: string): void {
     if (!this.isConnected || !this.stompClient) {
       console.error('WebSocket not connected');
       return;
     }
 
-    const subscription = this.stompClient.subscribe(
-      `/topic/typing/${chatSessionId}`,
+    // check if the subscription already opened for the current session
+    if (this.chatState.value.currentSessionId === currentSessionId) {
+      return;
+    }
+
+    // unsubscribe from the previous subscription
+    if (this.currentSessionSubscription) {
+      this.currentSessionSubscription.unsubscribe();
+      this.currentSessionSubscription = null;
+    }
+
+    // subscribe to the current session messages
+    this.currentSessionSubscription = this.stompClient.subscribe(
+      `/topic/sessions/${currentSessionId}/messages`,
       (message: StompMessage) => {
-        const isTyping = JSON.parse(message.body);
-        if (isTyping) {
-          this.addTypingUser(chatSessionId);
-        } else {
-          this.removeTypingUser(chatSessionId);
-        }
+        const receivedMessages: Message[] = JSON.parse(message.body);
+        this.chatState.next({
+          ...this.chatState.value,
+          currentSessionId: currentSessionId,
+          messages: receivedMessages,
+        });
       }
     );
-
-    this.subscriptions.set(`typing_${chatSessionId}`, subscription);
   }
 
   /**
@@ -149,54 +231,12 @@ export class ChatService implements OnDestroy {
     const message = {
       message: request.message,
       sender: request.sender,
-      chatSession: { id: request.chatSessionId },
+      chatSessionId: request.chatSessionId,
+      receiver: request.receiver,
     };
 
     this.stompClient.publish({
       destination: '/app/chat.send',
-      body: JSON.stringify(message),
-    });
-  }
-
-  /**
-   * Get messages for a chat session
-   */
-  public getMessages(request: GetMessagesRequest): void {
-    if (!this.isConnected || !this.stompClient) {
-      console.error('WebSocket not connected');
-      return;
-    }
-
-    this.chatState.next({
-      ...this.chatState.value,
-      loading: true,
-    });
-
-    this.stompClient.publish({
-      destination: '/app/chat.list',
-      body: JSON.stringify({
-        chatSessionId: request.chatSessionId,
-        page: request.page,
-      }),
-    });
-  }
-
-  /**
-   * Mark messages as read
-   */
-  public markAsRead(request: MarkReadRequest): void {
-    if (!this.isConnected || !this.stompClient) {
-      console.error('WebSocket not connected');
-      return;
-    }
-
-    const message = {
-      chatSession: { id: request.chatSessionId },
-      sender: request.userId,
-    };
-
-    this.stompClient.publish({
-      destination: '/app/chat.read',
       body: JSON.stringify(message),
     });
   }
@@ -232,80 +272,40 @@ export class ChatService implements OnDestroy {
   }
 
   /**
-   * Send typing indicator
+   * Load initial messages for a chat session
    */
-  public sendTypingIndicator(chatSessionId: string): void {
+  public loadInitialMessages(sessionId: string): void {
     if (!this.isConnected || !this.stompClient) {
       console.error('WebSocket not connected');
       return;
     }
 
+    console.log('Loading initial messages for session:', sessionId);
     this.stompClient.publish({
-      destination: '/app/chat.typing',
-      body: chatSessionId,
+      destination: '/app/chat.load_messages',
+      body: JSON.stringify({ chatSessionId: sessionId, page: 0 }),
     });
   }
 
   /**
-   * Add a message to the state
-   */
-  private addMessage(message: Message): void {
-    const currentState = this.chatState.value;
-    const updatedMessages = [...currentState.messages, message];
-
-    this.chatState.next({
-      ...currentState,
-      messages: updatedMessages,
-    });
-  }
-
-  /**
-   * Add typing user to the state
-   */
-  private addTypingUser(chatSessionId: string): void {
-    const currentState = this.chatState.value;
-    if (!currentState.typingUsers.includes(chatSessionId)) {
-      this.chatState.next({
-        ...currentState,
-        typingUsers: [...currentState.typingUsers, chatSessionId],
-      });
-    }
-  }
-
-  /**
-   * Remove typing user from the state
-   */
-  private removeTypingUser(chatSessionId: string): void {
-    const currentState = this.chatState.value;
-    this.chatState.next({
-      ...currentState,
-      typingUsers: currentState.typingUsers.filter(
-        (id) => id !== chatSessionId
-      ),
-    });
-  }
-
-  /**
-   * Set current chat session
+   * Set current chat session and load initial messages
    */
   public setCurrentSession(sessionId: string): void {
     this.chatState.next({
       ...this.chatState.value,
       currentSessionId: sessionId,
     });
-  }
 
-  /**
-   * Clear messages for a specific session
-   */
-  public clearMessages(sessionId: string): void {
-    const currentState = this.chatState.value;
-    this.chatState.next({
-      ...currentState,
-      messages: currentState.messages.filter(
-        (msg) => msg.chatSession.id !== sessionId
-      ),
-    });
+    // Subscribe to typing events for this session
+    if (this.isConnected && this.stompClient) {
+      this.stompClient.subscribe(
+        `/topic/sessions/${sessionId}/typing`,
+        (message: StompMessage) => {
+          // Handle typing indicator
+          console.log('Typing event received:', message.body);
+        }
+      );
+    }
   }
 
   /**
@@ -320,10 +320,54 @@ export class ChatService implements OnDestroy {
    */
   public disconnect(): void {
     if (this.stompClient) {
-      this.subscriptions.forEach((subscription) => subscription.unsubscribe());
-      this.subscriptions.clear();
+      this.currentSessionSubscription?.unsubscribe();
+      this.currentSessionSubscription = null;
       this.stompClient.deactivate();
     }
+  }
+
+  /**
+   * Create a new chat session between two users
+   */
+  public createChatSession(
+    userId1: string,
+    userId2: string
+  ): Observable<ChatSession> {
+    return this.http.post<ChatSession>(
+      `${AppConfig.API_BASE_URL}/chat/create-session`,
+      null,
+      {
+        params: { userId1, userId2 },
+      }
+    );
+  }
+
+  /**
+   * Get the receiver ID from the current chat session
+   */
+  public getReceiverFromCurrentSession(): string | null {
+    const currentState = this.chatState.value;
+    const currentSessionId = currentState.currentSessionId;
+
+    if (!currentSessionId) {
+      return null;
+    }
+
+    // Find the current session
+    const currentSession = currentState.chatSessions.find(
+      (session) => session.id === currentSessionId
+    );
+
+    if (!currentSession || !currentSession.participants) {
+      return null;
+    }
+
+    // Find the participant who is not the current user
+    const receiver = currentSession.participants.find(
+      (participant) => participant.user.id !== this.currentUserId
+    );
+
+    return receiver ? receiver.user.id : null;
   }
 
   /**

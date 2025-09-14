@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, Input } from '@angular/core';
 import { ChatAsideComponent } from './components/chat-aside/chat-aside.component';
 import { ChatMainComponent } from './components/chat-main/chat-main.component';
 import { NavabrComponent } from '../../shared/components/navabr/navabr.component';
@@ -13,4 +13,6 @@ import { NavabrComponent } from '../../shared/components/navabr/navabr.component
     class: 'flex h-screen',
   },
 })
-export class ChatComponent {}
+export class ChatComponent {
+  @Input() friendId: string | null = null;
+}

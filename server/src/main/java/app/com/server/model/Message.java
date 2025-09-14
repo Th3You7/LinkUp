@@ -1,14 +1,21 @@
 package app.com.server.model;
 
 
-import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -26,5 +33,6 @@ public class Message {
     private Instant createdAt = Instant.now();
     @ManyToOne()
     @JoinColumn(name = "chat_session_id")
+    @JsonBackReference
     private ChatSession chatSession;
 }

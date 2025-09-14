@@ -34,12 +34,13 @@
       aria-label="Toggle navigation"
     >
       <span class="lg:block hidden relative shrink-0">
-        <img
-          class="shrink-0 size-8 rounded-full"
-          src="https://images.unsplash.com/photo-1601935111741-ae98b2b230b0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=320&h=320&q=80"
-          alt="Avatar"
-        />
+        <div
+          class="shrink-0 size-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium"
+        >
+          {{ getParticipantInitial() }}
+        </div>
         <span
+          *ngIf="isOnline"
           class="absolute -bottom-0 -end-0 block size-2 rounded-full ring-2 ring-white bg-green-500"
         ></span>
       </span>
@@ -47,10 +48,13 @@
         <span
           class="truncate block font-semibold text-sm leading-4 text-gray-800"
         >
-          Costa Quinn
+          {{ getParticipantName() }}
         </span>
-        <span class="truncate block text-xs text-blue-600 leading-4">
-          Online
+        <span
+          class="truncate block text-xs leading-4"
+          [class]="getStatusColor()"
+        >
+          {{ getStatusText() }}
         </span>
       </span>
     </button>

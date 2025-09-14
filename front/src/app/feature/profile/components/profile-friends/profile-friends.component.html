@@ -53,6 +53,7 @@
           <div class="flex space-x-2 mt-auto">
             <button
               class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
+              (click)="openMessageModal(friendship)"
             >
               Message
             </button>
@@ -99,4 +100,13 @@
       </p>
     </div>
   </div>
+
+  <!-- Message Modal -->
+  <app-message-modal
+    [isOpen]="isMessageModalOpen"
+    [friendId]="selectedFriend?.id || null"
+    [friendName]="selectedFriend?.name || ''"
+    [friendUsername]="selectedFriend?.username || ''"
+    (closeModal)="closeMessageModal()"
+  ></app-message-modal>
 </div>

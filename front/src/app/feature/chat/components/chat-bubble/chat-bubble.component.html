@@ -1,72 +1,97 @@
-<div class="max-w-md ms-auto text-end flex justify-end gap-x-2">
+<div
+  class="max-w-md flex gap-x-2"
+  [class.ms-auto]="isOwnMessage"
+  [class.text-end]="isOwnMessage"
+  [class.text-start]="!isOwnMessage"
+  [class.justify-end]="isOwnMessage"
+>
   <!-- Chat Bubble -->
-  <div>
-    <p class="mb-1.5 pe-2.5 text-xs text-gray-400">
-      {{ senderName }}
-    </p>
+  <div
+    class="group flex gap-x-2"
+    [class.justify-end]="isOwnMessage"
+    [class.justify-start]="!isOwnMessage"
+    [class.flex-row-reverse]="isOwnMessage"
+    style="word-break: break-word"
+  >
+    <div
+      class="text-start inline-block rounded-xl pt-2 pb-1.5 px-2.5"
+      [class.bg-blue-100]="isOwnMessage"
+      [class.bg-gray-100]="!isOwnMessage"
+    >
+      <div class="text-sm text-gray-800">
+        {{ message.message }}
 
-    <div class="space-y-1">
-      <div
-        *ngFor="let message of messages; trackBy: trackByMessageId"
-        class="group flex justify-end gap-x-2"
-        style="word-break: break-word"
-      >
-        <div
-          class="order-2 text-start bg-blue-100 inline-block rounded-xl pt-2 pb-1.5 px-2.5"
+        <span class="inline-flex items-center gap-x-1 pl-2">
+          <span class="text-[11px] text-end text-gray-400 italic">
+            {{ formattedTime }}
+          </span>
+          <svg
+            *ngIf="isOwnMessage"
+            class="inline-block shrink-0 size-4 text-gray-400"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 6 7 17l-5-5" />
+            <path d="m22 10-7.5 7.5L13 16" />
+          </svg>
+        </span>
+      </div>
+    </div>
+
+    <!-- More Dropdown -->
+    <div class="lg:opacity-0 lg:group-hover:opacity-100">
+      <div class="relative inline-flex">
+        <button
+          [id]="'hs-pro-cht1cmd_' + message.id"
+          type="button"
+          class="flex justify-center items-center gap-x-3 size-8 text-sm text-gray-600 hover:bg-gray-200 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-200"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-label="Dropdown"
+          (click)="toggleDropdown(message.id)"
         >
-          <div class="text-sm text-gray-800">
-            <div
-              *ngIf="message.hasReply && message.replyTo"
-              class="mb-2 py-1 ps-2.5 pe-1.5 relative cursor-default bg-blue-50 before:bg-blue-600 rounded-lg overflow-hidden group-focus:scale-[.98] transition before:absolute before:inset-y-0 before:start-0 before:w-[3px] before:h-full"
-            >
-              <blockquote>
-                <p class="font-medium text-[13px] text-blue-600">
-                  {{ message.replyTo.name }}
-                </p>
-                <p class="text-[13px] text-gray-800">
-                  {{ message.replyTo.message }}
-                </p>
-              </blockquote>
-            </div>
-            {{ message.content }}
-
-            <span class="inline-flex items-center gap-x-1 pl-2">
-              <span class="text-[11px] text-end text-gray-400 italic">
-                {{ message.timestamp }}
-              </span>
-              <svg
-                class="inline-block shrink-0 size-4 text-gray-400"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M18 6 7 17l-5-5" />
-                <path d="m22 10-7.5 7.5L13 16" />
-              </svg>
-            </span>
-          </div>
-        </div>
+          <svg
+            class="shrink-0 size-4 rounded-full"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="12" cy="5" r="1" />
+            <circle cx="12" cy="19" r="1" />
+          </svg>
+        </button>
 
         <!-- More Dropdown -->
-        <div class="order-1 lg:opacity-0 lg:group-hover:opacity-100">
-          <div class="relative inline-flex">
+        <div
+          *ngIf="openDropdownId === message.id"
+          class="absolute bottom-full mb-2 w-32 z-8 bg-white rounded-xl shadow-lg before:h-4 before:absolute before:-top-4 before:start-0 before:w-full after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full"
+          [class.right-0]="isOwnMessage"
+          [class.left-0]="!isOwnMessage"
+          role="menu"
+          aria-orientation="vertical"
+          [attr.aria-labelledby]="'hs-pro-cht1cmd_' + message.id"
+        >
+          <div class="p-1">
             <button
-              [id]="'hs-pro-cht1cmd_' + message.id"
-              type="button"
-              class="flex justify-center items-center gap-x-3 size-8 text-sm text-gray-600 hover:bg-gray-200 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-200"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              aria-label="Dropdown"
-              (click)="toggleDropdown(message.id)"
+              class="flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-xs text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 w-full text-left"
+              (click)="handleEdit(message.id)"
             >
               <svg
-                class="shrink-0 size-4 rounded-full"
+                class="shrink-0 size-3.5"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
@@ -77,104 +102,64 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <circle cx="12" cy="12" r="1" />
-                <circle cx="12" cy="5" r="1" />
-                <circle cx="12" cy="19" r="1" />
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                <path d="m15 5 4 4" />
               </svg>
+              Edit
             </button>
-
-            <!-- More Dropdown -->
-            <div
-              *ngIf="openDropdownId === message.id"
-              class="absolute bottom-full right-0 mb-2 w-32 z-8 bg-white rounded-xl shadow-lg before:h-4 before:absolute before:-top-4 before:start-0 before:w-full after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full"
-              role="menu"
-              aria-orientation="vertical"
-              [attr.aria-labelledby]="'hs-pro-cht1cmd_' + message.id"
+            <button
+              class="flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-xs text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 w-full text-left"
+              (click)="handleReply(message.id)"
             >
-              <div class="p-1">
-                <button
-                  class="flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-xs text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 w-full text-left"
-                  (click)="handleEdit(message.id)"
-                >
-                  <svg
-                    class="shrink-0 size-3.5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
-                    />
-                    <path d="m15 5 4 4" />
-                  </svg>
-                  Edit
-                </button>
-                <button
-                  class="flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-xs text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 w-full text-left"
-                  (click)="handleReply(message.id)"
-                >
-                  <svg
-                    class="shrink-0 size-3.5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                    />
-                    <path d="m10 7-3 3 3 3" />
-                    <path d="M17 13v-1a2 2 0 0 0-2-2H7" />
-                  </svg>
-                  Reply
-                </button>
-                <button
-                  class="flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-xs text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 w-full text-left"
-                  (click)="handleDelete(message.id)"
-                >
-                  <svg
-                    class="shrink-0 size-3.5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18" />
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                    <line x1="10" x2="10" y1="11" y2="17" />
-                    <line x1="14" x2="14" y1="11" y2="17" />
-                  </svg>
-                  Delete
-                </button>
-              </div>
-            </div>
-            <!-- End More Dropdown -->
+              <svg
+                class="shrink-0 size-3.5"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                />
+                <path d="m10 7-3 3 3 3" />
+                <path d="M17 13v-1a2 2 0 0 0-2-2H7" />
+              </svg>
+              Reply
+            </button>
+            <button
+              class="flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-xs text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 w-full text-left"
+              (click)="handleDelete(message.id)"
+            >
+              <svg
+                class="shrink-0 size-3.5"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                <line x1="10" x2="10" y1="11" y2="17" />
+                <line x1="14" x2="14" y1="11" y2="17" />
+              </svg>
+              Delete
+            </button>
           </div>
         </div>
         <!-- End More Dropdown -->
       </div>
     </div>
-  </div>
-  <!-- End Chat Bubble -->
-
-  <div class="shrink-0 mt-auto">
-    <img class="shrink-0 size-8 rounded-full" [src]="avatar" alt="Avatar" />
+    <!-- End More Dropdown -->
   </div>
 </div>

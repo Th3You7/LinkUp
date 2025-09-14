@@ -1,7 +1,8 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, Input } from '@angular/core';
 import { ChatMainHeaderComponent } from '../chat-main-header/chat-main-header.component';
 import { ChatMainContentComponent } from '../chat-main-content/chat-main-content.component';
 import { ChatMainInputComponent } from '../chat-main-input/chat-main-input.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chat-main',
@@ -9,6 +10,7 @@ import { ChatMainInputComponent } from '../chat-main-input/chat-main-input.compo
     ChatMainHeaderComponent,
     ChatMainContentComponent,
     ChatMainInputComponent,
+    CommonModule,
   ],
   templateUrl: './chat-main.component.html',
   styleUrl: './chat-main.component.css',
@@ -17,4 +19,6 @@ import { ChatMainInputComponent } from '../chat-main-input/chat-main-input.compo
     class: 'flex-2 flex flex-col',
   },
 })
-export class ChatMainComponent {}
+export class ChatMainComponent {
+  @Input() friendId: string | null = null;
+}

@@ -11,4 +11,5 @@ public interface ChatParticipiantRepository extends JpaRepository<ChatParticipan
 
     List<ChatParticipant> findAllByChatSession_Id(UUID chatId);
     ChatParticipant findByChatSession_IdAndUser_Id(UUID chatId, UUID userId);
+    List<ChatParticipant> findAllByUser_Id(UUID userId);
 }
