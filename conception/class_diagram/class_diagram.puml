@@ -3,79 +3,86 @@ class User {
     -id: UUID
     -firstName: String
     -lastName: String
+    -username: String
     -email: String
     -password: String
+   
 }
 
 class Friendship {
     -id: UUID
-    -status: String
+    -status: FriendshipInvitationStatus
+    -createdAt: Instant
+    -updatedAt: Instant
 }
 
 class Post {
-    -id: UUID
+    -id: String
+    -title: String
     -content: String
-    -imgUrl: String
+    -image: String
+    -createdAt: LocalDateTime
+    -updatedAt: LocalDateTime
 }
 
 class Comment {
-    -id: UUID
+    -id: String
     -content: String
-    -createdAt: DateTime
-    -updatedAt: DateTime
+    -createdAt: LocalDateTime
+    -updatedAt: LocalDateTime
 }
 
-class Like {
-    -id: UUID
-    -createdAt: DateTime
+class Reaction {
+    -id: String
+    -name: String
 }
 
-class Reply {
-    -id: UUID
-    -createAt: DateTime
-    -updatedAt: DateTime
-}
+
 
 class ChatSession {
     -id: UUID
-    -chatSessionId: String
-    -user_1: User
-    -user_2: User
-    -User1LastReadAt: DateTime
-    -User2LastReadAt: DateTime
     -lastMessage: Message
+}
+
+class ChatParticipant {
+    -id: UUID
+    -joinedAt: Instant
+    -lastReadAt: Instant
 }
 
 class Message {
     -id: UUID
-    -contentType: String
-    -mediaUrl: String
-    -content: String
+    -message: String
+    -sender: String
+    -createdAt: Instant
 }
 
-class Invitation {
-    -status: InvitationStatus
-    -Invitation
-}
 
-enum InvitationStatus {
-    ACCEPTED,
+enum FriendshipInvitationStatus {
     PENDING,
-    REJECTED,
-    CANCELED
+    ACCEPTED,
+    BLOCKED,
+    CANCELLED
 }
 
 
 User "1" -- "0..*" Post : "manage"
-User "1" -- "0..*" Like : "manage"
-User "1" -- "0..* " Comment : "manage"
-User "1" -- "0..*" Reply : "manage"
-User "2" -- "0..*" ChatSession : "manage"
-User "2" -- "0..*" Invitation : "manage"
-User "2" -- "0..*" Friendship : "manage" 
-ChatSession "1" *-- "1..* " Message : "has"
-Post "1" *-- "0..*" Like : "has"
+
+
+
 Post "1" *-- "0..*" Comment : "has"
+Post "1" *-- "0..*" Reaction : "has"
+
+User "*" -- "0..*" Friendship : "manage"
+
+User "1" -- "1" ChatParticipant : "participates"
+ChatSession "1" *-- "2" ChatParticipant : "has"
+ChatSession "1" -- "1..*" Message : "contains"
+
+
+
+
+
 
 
 @enduml
