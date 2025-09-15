@@ -32,11 +32,7 @@ rectangle LinkUpApp {
     usecase (Update Reaction) as U19
     usecase (Delete Post's Reaction) as U20
 
-    usecase (Create Comment's Reply) as U21
-    usecase (Read Comment's Reply) as U22
-    usecase (Read All comment's  Replies) as U23
-    usecase (Update Comment's Reply) as U24
-    usecase (Delete Comment's Reply) as U25
+ 
 
     usecase (Send Message) as U26
     usecase (Read Message) as U27
@@ -46,9 +42,7 @@ rectangle LinkUpApp {
 
     usecase (Visit User Profile) as U31
     usecase (Update Profile) as U32
-    usecase (Delete Account) as U33
 
-    usecase (Read Notifications) as U34
     usecase (Delete Chat Session) as U35
     usecase (Block User) as U36
     usecase (Authentication) as U37
@@ -56,12 +50,10 @@ rectangle LinkUpApp {
 }
 
 A1 -- A2
-A1 -- A3
 
 
-A3 -- U31
+
 A3 -- U1
-A3 -- U7
 
 A2 -- U1
 A2 -- U2
@@ -89,11 +81,6 @@ A2 -- U18
 A2 -- U19
 A2 -- U20
 
-A2 -- U21
-A2 -- U22
-A2 -- U23
-A2 -- U24
-A2 -- U25
 
 A2 -- U26
 A2 -- U27
@@ -103,9 +90,7 @@ A2 -- U30
 
 A2 -- U31
 A2 -- U32
-A2 -- U33
 
-A2 -- U34
 A2 -- U35
 A2 -- U36
 
@@ -131,11 +116,6 @@ U18 --> U37 : <<include>>
 U19 --> U37 : <<include>>
 U20 --> U37 : <<include>>
 
-U21 --> U37 : <<include>>
-U22 --> U37 : <<include>>
-U23 --> U37 : <<include>>
-U24 --> U37 : <<include>>
-U25 --> U37 : <<include>>
 
 U26 --> U37 : <<include>>
 U27 --> U37 : <<include>>
@@ -145,9 +125,8 @@ U30 --> U37 : <<include>>
 
 
 U32 --> U37 : <<include>>
-U33 --> U37 : <<include>>
+U31 --> U37 : <<include>>
 
-U34 --> U37 : <<include>>
 U35 --> U37 : <<include>>
 U36 --> U37 : <<include>>
 
